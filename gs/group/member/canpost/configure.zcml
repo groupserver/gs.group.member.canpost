@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  xmlns:rdb="http://namespaces.zope.org/rdb"
+  xmlns:sqlos="http://namespaces.sqlobject.org/sqlos"
+  xmlns:five="http://namespaces.zope.org/five">
+
+  <!--Posting User Adaptor-->
+  <class class=".usercanpost.GSGroupMemberPostingInfo">
+      <implements interface=".interfaces.IGSPostingUser" />
+  </class>
+  <adapter
+    factory=".usercanpost.GSGroupMemberPostingInfo"
+    for="Products.XWFChat.interfaces.IGSGroupFolder Products.CustomUserFolder.interfaces.IGSUserInfo"
+    provides=".interfaces.IGSPostingUser" />
+
+  <!--Content Provider-->
+  <interface 
+    interface=".interfaces.IGSUserCanPostContentProvider"
+    type="zope.contentprovider.interfaces.ITALNamespaceData"/>
+  <class class=".usercanpostcontentprovider.GSUserCanPostContentProvider">
+    <implements interface=".interfaces.IGSUserCanPostContentProvider"/>
+  </class>
+  <adapter
+    for="zope.interface.Interface zope.publisher.interfaces.browser.IDefaultBrowserLayer zope.interface.Interface"
+    factory=".usercanpostcontentprovider.GSUserCanPostContentProvider"
+    provides="zope.contentprovider.interfaces.IContentProvider"
+    name="groupserver.UserCanPost"/>
+
+</configure>
+
