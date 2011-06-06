@@ -32,6 +32,14 @@ setup(name='gs.group.member.canpost',
     zip_safe=True,
     install_requires=[
         'setuptools',
+        'gs.group.base',
+        'Products.CustomUserFolder',
+        'Products.XWFChat',
+        'Products.GSGroup',
+        'Products.XWFCore.XWFUtils',
+        'Products.GSSearch',
+        'Products.GSProfile',
+        'gs.profile.email.base',
         # -*- Extra requirements: -*-
     ],
     entry_points="""

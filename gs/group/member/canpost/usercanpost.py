@@ -7,6 +7,7 @@ from zope.component import createObject
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from Products.XWFChat.interfaces import IGSGroupFolder
 from Products.GSGroup.interfaces import IGSGroupInfo
+#TODO fix:
 from Products.GSGroupMember.groupmembership import user_member_of_group,\
   user_participation_coach_of_group, user_admin_of_group 
 from Products.XWFCore.XWFUtils import munge_date, timedelta_to_string, \
