@@ -1,11 +1,9 @@
 # coding=utf-8
 import pytz
 from datetime import datetime, timedelta
-
+from zope.cachedescriptors.property import Lazy
 from zope.app.apidoc import interface
-from zope.component import createObject, adapts
-from zope.interface import implements
-
+from zope.component import createObject
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from Products.XWFChat.interfaces import IGSGroupFolder
 from Products.GSGroup.interfaces import IGSGroupInfo
@@ -16,45 +14,43 @@ from Products.XWFCore.XWFUtils import munge_date, timedelta_to_string, \
 from Products.GSSearch.queries import MessageQuery
 from Products.GSProfile import interfaces as profileinterfaces
 from gs.profile.email.base.emailuser import EmailUser
-from interfaces import IGSPostingUser
 
-#TODO Replace with an audit trail
 import logging
-log = logging.getLogger('GSGroupMember')
+log = logging.getLogger('gs.group.member.canpost.usercanpost')
 
 class GSGroupMemberPostingInfo(object):
-
-    adapts(IGSGroupFolder, IGSUserInfo)
-    implements(IGSPostingUser)
-
     def __init__(self, group, userInfo):
         assert IGSGroupFolder.providedBy(group),\
           u'%s is not a group folder' % group
         assert IGSUserInfo.providedBy(userInfo),\
           u'%s is not a user-info' % userInfo
         
-        self.site_root = site_root = group.site_root()
-        
-        self.mailingListManager = site_root.ListManager
-        self.mailingList = self.mailingListManager.get_list(group.getId())
-        
+        self.site_root = group.site_root()
         self.userInfo = userInfo
         self.groupInfo = IGSGroupInfo(group)
-        
-        da = site_root.zsqlalchemy 
-        assert da
-        self.messageQuery = MessageQuery(group, da)
         
         self.__status = None
         self.__statusNum = 0
         self.__canPost = None
         self.__profileInterfaces = None
+
+    @Lazy
+    def mailingList(self):
+        mailingListManager = self.site_root.ListManager
+        retval = mailingListManager.get_list(self.groupInfo.id)
+        return retval
+        
+    @Lazy
+    def messageQuery(self):
+        da = self.site_root.zsqlalchemy 
+        assert da
+        retval = MessageQuery(self.groupInfo.group, da)
+        return retval
     
-    @property
+    @Lazy
     def status(self):
-        if self.__status == None:
-            # call self.canPost so that __status gets set as a side-effect.
-            _justCall = self.canPost
+        # call self.canPost so that __status gets set as a side-effect.
+        _justCall = self.canPost
         retval = self.__status
         assert retval
         assert type(retval) == unicode
@@ -66,19 +62,17 @@ class GSGroupMemberPostingInfo(object):
         assert type(retval) == int
         return retval
 
-    @property
+    @Lazy
     def canPost(self):
-        if self.__canPost == None:
-            self.__canPost = \
-              self.group_is_unclosed() or\
-               (not(self.user_anonymous()) and\
-                self.user_is_member() and\
-                self.user_has_preferred_email_addresses() and\
-                self.user_is_posting_member() and\
-                not(self.user_posting_limit_hit()) and\
-                not(self.user_blocked_from_posting()) and\
-                self.user_has_required_properties())
-        retval = self.__canPost
+        retval = \
+          self.group_is_unclosed() or\
+           (not(self.user_anonymous()) and\
+            self.user_is_member() and\
+            self.user_has_preferred_email_addresses() and\
+            self.user_is_posting_member() and\
+            not(self.user_posting_limit_hit()) and\
+            not(self.user_blocked_from_posting()) and\
+            self.user_has_required_properties())
         assert type(retval) == bool
         return retval
         
