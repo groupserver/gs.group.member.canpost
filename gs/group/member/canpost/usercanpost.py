@@ -7,14 +7,13 @@ from zope.component import createObject
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from Products.XWFChat.interfaces import IGSGroupFolder
 from Products.GSGroup.interfaces import IGSGroupInfo
-#TODO fix:
-from Products.GSGroupMember.groupmembership import user_member_of_group,\
-  user_participation_coach_of_group, user_admin_of_group 
 from Products.XWFCore.XWFUtils import munge_date, timedelta_to_string, \
   comma_comma_and
 from Products.GSSearch.queries import MessageQuery
 from Products.GSProfile import interfaces as profileinterfaces
 from gs.profile.email.base.emailuser import EmailUser
+from gs.group.member.base.utils import user_member_of_group, \
+    user_admin_of_group, user_participation_coach_of_group
 
 import logging
 log = logging.getLogger('gs.group.member.canpost.usercanpost')
@@ -57,7 +56,7 @@ class GSGroupMemberPostingInfo(object):
         assert type(retval) == unicode
         return retval
 
-    @property
+    @Lazy
     def statusNum(self):
         retval = self.__statusNum
         assert type(retval) == int
@@ -66,14 +65,14 @@ class GSGroupMemberPostingInfo(object):
     @Lazy
     def canPost(self):
         retval = \
-          self.group_is_unclosed() or\
-           (not(self.user_anonymous()) and\
-            self.user_is_member() and\
-            self.user_has_preferred_email_addresses() and\
-            self.user_is_posting_member() and\
-            not(self.user_posting_limit_hit()) and\
-            not(self.user_blocked_from_posting()) and\
-            self.user_has_required_properties())
+        not(self.user_blocked_from_posting()) and\
+            (self.group_is_unclosed() or\
+                ((not(self.user_anonymous()) and\
+                    self.user_is_member() and\
+                    self.user_has_preferred_email_addresses() and\
+                    self.user_is_posting_member() and\
+                    not(self.user_posting_limit_hit()) and\
+                    self.user_has_required_properties())))
         assert type(retval) == bool
         return retval
         
