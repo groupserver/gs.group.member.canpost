@@ -65,14 +65,14 @@ class GSGroupMemberPostingInfo(object):
     @Lazy
     def canPost(self):
         retval = \
-        not(self.user_blocked_from_posting()) and\
-            (self.group_is_unclosed() or\
-                ((not(self.user_anonymous()) and\
-                    self.user_is_member() and\
-                    self.user_has_preferred_email_addresses() and\
-                    self.user_is_posting_member() and\
-                    not(self.user_posting_limit_hit()) and\
-                    self.user_has_required_properties())))
+          not(self.user_blocked_from_posting()) and\
+              (self.group_is_unclosed() or\
+                  ((not(self.user_anonymous()) and\
+                      self.user_is_member() and\
+                      self.user_has_preferred_email_addresses() and\
+                      self.user_is_posting_member() and\
+                      not(self.user_posting_limit_hit()) and\
+                      self.user_has_required_properties())))
         assert type(retval) == bool
         return retval
         
@@ -139,8 +139,7 @@ class GSGroupMemberPostingInfo(object):
         role in the group context. While this may sound like I am stating
         the blindingly obvious, this was not always the case!
         '''
-        retval = user_member_of_group(self.userInfo.user, 
-                                      self.groupInfo.groupObj)
+        retval = user_member_of_group(self.userInfo, self.groupInfo)
         if retval:
             self.__status = u'a member'
         else:
