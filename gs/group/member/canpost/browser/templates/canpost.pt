@@ -1,39 +1,39 @@
-<span xmlns:metal="http://xml.zope.org/namespaces/metal" 
-  xmlns:tal="http://xml.zope.org/namespaces/tal"
-  tal:define="view options/view; statusNum view/statusNum; status view/status"
-  class="canPost">
+<div class="canPost"
+  tal:define="view options/view; statusNum view/statusNum; status view/status">
   <span tal:condition="python:statusNum == 0">You can post</span>
   <span tal:condition="python:statusNum &amp; 1" class="not-a-member">
     <strong>You cannot post</strong> because you are not a member of
     <span class="group" tal:content="view/groupInfo/name">this group</span>.
     <!--unclosed?-->
   </span>
-  <span tal:condition="python:statusNum &amp; 2" class="not-logged-in">
+  <span id="can-post-anon"
+    tal:condition="python:statusNum &amp; 2" class="not-logged-in">
     <strong>You cannot post</strong> because you are not logged in.
-    If you are a member
-    <span class="group" tal:content="view/groupInfo/name">this 
-      group</span>,
-    <a href="#"
-      tal:attributes="href view/loginUrl">login</a> to post to this topic.
-    <!-- public?-->
-    <span tal:condition="python:view.joinability == 'anyone'">
+    If you are a member of
+    <span class="group" 
+      tal:content="view/groupInfo/name">this group</span>,
+    <a href="#" class="login"
+      tal:attributes="href view/loginUrl">login</a> 
+    to post to this topic.
+    <span id="can-post-anon-public"
+      tal:condition="python:view.joinability == 'anyone'">
       Otherwise 
       <a href="#"
         tal:define="u view/request/URL; g view/groupInfo/id"
         tal:attributes="href string:/request_registration.html?form.came_from=${u}&amp;form.groupId=${g}"
         title="Sign up and join this group">sign up,</a>
       become a member of 
-      <span class="group" tal:content="view/groupInfo/name">this 
-        group</span>,
+      <span class="group" 
+        tal:content="view/groupInfo/name">this group</span>,
       and post to this topic.
-    </span>
-  </span>
+    </span><!--can-post-anon-public-->
+  </span><!--can-post-anon-->
   <span tal:condition="python:statusNum &amp; 4" class="no-preferred-email">
-    <strong>You cannot post</strong> because you have no default email address.
+    <strong>You cannot post</strong> because you have no default email 
+    address.
     Go to 
-    <a href="#"
-      tal:attributes="href string:${view/userInfo/url}/email.html">your
-        email settings page,</a>
+    <a tal:attributes="href string:${view/userInfo/url}/emailsettings.html"
+      href="#">your email settings page,</a>
     and set a default email address.
   </span>
   <span tal:condition="python:statusNum &amp; 8" class="not-a-member">
@@ -47,10 +47,9 @@
       to post.
     </span>
     <span tal:condition="view/canInvite">
-      <a href="#"
-        tal:attributes="href string:${view/ptnCoach/url}">Contact the 
-        participation coach</a>
-      to join
+      <a tal:attributes="href string:${view/groupInfo/url}/request.html"
+        href="#">Request membership</a>
+      of
       <span class="group"
         tal:content="view/groupInfo/name">this group</span>.
     </span>
@@ -91,5 +90,5 @@
         title string:Change the profile of ${view/userInfo/name}">your 
       Change Profile page</a> and set the required profile attributes.
   </span>
-</span>
+</div><!--canPost-->
 
