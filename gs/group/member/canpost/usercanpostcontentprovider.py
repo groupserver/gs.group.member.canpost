@@ -1,7 +1,7 @@
 # coding=utf-8
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject
-from zope.pagetemplate.pagetemplatefile import PageTemplateFile
+from zope.app.pagetemplate import ViewPageTemplateFile
 from zope.contentprovider.interfaces import  UpdateNotCalled
 from Products.GSGroup.joining import GSGroupJoining # --=mpj17=-- ?
 from Products.GSGroupMember.groupmembership import JoinableGroupsForSite, InvitationGroupsForSite
@@ -21,8 +21,8 @@ class GSUserCanPostContentProvider(GroupContentProvider):
         if not self.__updated:
             raise UpdateNotCalled
 
-        pageTemplate = PageTemplateFile(self.pageTemplateFileName)
-        return pageTemplate(view=self)
+        pageTemplate = ViewPageTemplateFile(self.pageTemplateFileName)
+        return pageTemplate(self, view=self)
         
     #########################################
     # Non standard methods below this point #
@@ -37,14 +37,14 @@ class GSUserCanPostContentProvider(GroupContentProvider):
 
     @Lazy
     def canJoin(self):
-        joinableGroups = JoinableGroupsForSite(self.loggedInUserInfo.user)
+        joinableGroups = JoinableGroupsForSite(self.loggedInUser.user)
         retval = self.groupInfo.id in joinableGroups
         assert type(retval) == bool
         return retval
     
     @Lazy
     def canInvite(self):
-        invitationGroups = InvitationGroupsForSite(self.loggedInUserInfo.user,
+        invitationGroups = InvitationGroupsForSite(self.loggedInUser.user,
                                                self.groupInfo.groupObj)
         retval = (self.groupInfo.id in invitationGroups) and \
           not self.canJoin
