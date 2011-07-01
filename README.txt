@@ -84,3 +84,9 @@ NA
   The person should not even get so far as seeing the can post 
   information. Therefore this test is not applicable.
 
+Todo
+----
+
+Add tests for group administrators. Should group administrators 
+automatically be considered posting members?
+
