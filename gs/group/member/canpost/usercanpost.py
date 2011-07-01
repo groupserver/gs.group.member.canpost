@@ -44,7 +44,7 @@ class GSGroupMemberPostingInfo(object):
     def messageQuery(self):
         da = self.site_root.zsqlalchemy 
         assert da
-        retval = MessageQuery(self.groupInfo.group, da)
+        retval = MessageQuery(self.groupInfo.groupObj, da)
         return retval
     
     @Lazy
