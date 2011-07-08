@@ -32,7 +32,7 @@
     <strong>You cannot post</strong> because you have no default email 
     address.
     Go to 
-    <a tal:attributes="href string:${view/userInfo/url}/emailsettings.html"
+    <a tal:attributes="href string:${view/loggedInUser/url}/emailsettings.html"
       href="#">your email settings page,</a>
     and set a default email address.
   </span>
@@ -86,8 +86,8 @@
     on your profile.
     To post, go to 
     <a href="#"
-      tal:attributes="href string:${view/userInfo/url}/edit.html;
-        title string:Change the profile of ${view/userInfo/name}">your 
+      tal:attributes="href string:${view/loggedInUser/url}/edit.html;
+        title string:Change the profile of ${view/loggedInUser/name}">your 
       Change Profile page</a> and set the required profile attributes.
   </span>
 </div><!--canPost-->
