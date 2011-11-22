@@ -1,0 +1,162 @@
+.. sectnum::
+
+==================================
+User Can Post: The Next Generation
+==================================
+
+:Authors: Michael JasonSmith
+:Contact: Michael JasonSmith <mpj17@onlinegroups.net>
+:Date: 2011-11-22
+:Organization: `GroupServer.org`_
+:Copyright: This document is licensed under a
+  `Creative Commons Attribution-Share Alike 3.0 New Zealand License`_
+  by `OnlineGroups.Net`_.
+
+The User Can Post code (``gs.group.member.canpost``) decides if a group
+member can post. In this document I present a proposed new structure
+for the User Can Post code. I begin by outlining the `rules`_ that have
+to be implemented, and then summarise how the existing system works
+(see `old system`_ below). I then present my proposed `new system`_.
+
+Rules
+=====
+
+[Taken from the README in ``gs.group.member.canpost``.]
+
+A person can post if one of two sets of rules are met. One rule is for `unclosed groups`_, the other is for `closed groups`_.
+
+Unclosed Groups
+---------------
+
+The first rule is that the someone can post if he or he is not blocked
+from posting and the group is *unclosed*.
+
+Blocked from posting
+  A member is blocked from posting if he or she has been added to the
+  ``blocked_members`` list.
+
+Email Blacklist
+  Posting from a particular email address is banned if the address is
+  listed in the ``email_blacklist`` table.
+  
+The group is unclosed
+  Support groups allow anyone who is not blocked to post, even if the
+  person posting does not have a profile. Due to the Teutonic heritage
+  of GroupServer, such groups are known as ``unclosed``.
+
+Closed Groups
+-------------
+
+The second rule is that a person can post if all of the following
+conditions are met. This is the most common check, because most groups
+are closed.
+
+Blocked from posting
+  A member is blocked from posting if he or she has been added to the
+  ``blocked_members`` list.
+
+Email Blacklist
+  Posting from a particular email address is banned if the address is
+  listed in the ``email_blacklist`` table.
+
+The group is closed
+  Most groups are closed: only members can post. 
+
+*Not* anonymous
+  Only people with profiles can post to closed groups.
+  
+Group member
+  The person posting must be a member of the group in order to post.
+  
+Has preferred email addresses
+  To post to a group the member must have at least one verified email
+  address. This rule exists to prevent people from partially creating
+  a profile and then posting to a group.
+
+The maximum posting rate has *not* been hit
+  GroupServer can limit the rate that members can post. This prevents
+  trite and trivial messages ("me too!") from being posted. The
+  posting rate only applies to normal members: participation coaches
+  and administrators are not subject to the posting rate.
+
+Member has the required properties
+  All required profile properties must be provided before a member can
+  post. There are two types of required properties: those that are 
+  required by the site, and those that are required for the group.
+
+
+Old System
+==========
+
+The old system implemented a monolithic whole. The ``GSGroupMemberPostingInfo`` class both checks to see if the group member can post, and provides a status message if the group member cannot post. The core check is carried out by a giant Boolean statement::
+
+  not(self.user_blocked_from_posting()) and\
+      (self.group_is_unclosed() or\
+          ((not(self.user_anonymous()) and\
+              self.user_is_member() and\
+              self.user_has_preferred_email_addresses() and\
+              self.user_is_posting_member() and\
+              not(self.user_posting_limit_hit()) and\
+              self.user_has_required_properties())))
+
+The statement is made up of two parts — one for the unclosed group,
+and one for the closed group — separated with an ``or``. Within
+each the two parts a series of rules are written, separated by some
+``and`` expressions. 
+
+The rules themselves are methods of the ``GSGroupMemberPostingInfo`` 
+class.
+
+New System
+==========
+
+I propose creating a system that made use of `adapters`_. The
+adapter would take a group and a group member, just like the current
+``GSGroupMemberPostingInfo`` class. However, different types of groups
+would have different adapter. This would allow different rules for
+
+  * Support groups, which are ``unclosed``,
+  * Standard discussion groups, which are ``closed``, and
+  * Announcement groups (see `Ticket 613`_).
+
+These adapters would provide an interface that is similar to the  
+existing code::
+
+  class IGSPostingUser(Interface):
+      canPost = Bool(title=u'Can Post',
+        description=u'Can the user post the the group?',
+        required=True)
+        
+      statusNum = Int(title=u'Status Number',
+        description=u'The reason the user cannot post to the group, '\
+          u'as a number. 0 if the user can post.',
+        required=True)
+        
+      status = Text(title=u'Status',
+        description=u'The reason the user cannot post to the group, '\
+          u'as a textual description.',)
+
+Internally the rules would be implemented by a series of other
+adapters. They would be acquired by a query for some named adapters
+that support a particular interface. This will allow the code to be
+shared between the three main adapters. For example, the check for a
+blocked email address should be done at site-level, and carried out by
+all groups. Another shared block of code could be for a *closed group*
+(see `Ticket 449`_).
+
+The adapters that implement the rules will have to be sortable. In
+this respect they are similar to the viewlets that make up the tabs
+on the group pages. (The Can Post adapters would be similar to the
+viewlet managers). The adapter must also be able to generate a string,
+describing the reason that the person was blocked.
+
+.. Resources
+
+.. _GroupServer.org: http://groupserver.org
+.. _Creative Commons Attribution-Share Alike 3.0 New Zealand License:
+   http://creativecommons.org/licenses/by-sa/3.0/nz/
+.. _OnlineGroups.Net: http://onlinegroups.net
+.. _Adapters: http://docs.zope.org/zope.component/README.html#adapters
+.. _Ticket 613: https://projects.iopen.net/groupserver/ticket/613
+.. _Ticket 449: https://projects.iopen.net/groupserver/ticket/449
+
