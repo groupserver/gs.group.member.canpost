@@ -157,6 +157,6 @@ describing the reason that the person was blocked.
    http://creativecommons.org/licenses/by-sa/3.0/nz/
 .. _OnlineGroups.Net: http://onlinegroups.net
 .. _Adapters: http://docs.zope.org/zope.component/README.html#adapters
-.. _Ticket 613: https://projects.iopen.net/groupserver/ticket/613
-.. _Ticket 449: https://projects.iopen.net/groupserver/ticket/449
+.. _Ticket 613: http://projects.iopen.net/groupserver/ticket/613
+.. _Ticket 449: http://projects.iopen.net/groupserver/ticket/449
 
