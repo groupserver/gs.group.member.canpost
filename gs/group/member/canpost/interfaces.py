@@ -3,7 +3,7 @@ from zope.interface.interface import Interface
 from zope.schema import Bool, Choice, Int, Text, TextLine
 from zope.contentprovider.interfaces import IContentProvider
 
-class IGSPostingUser(Interface):
+class ICanPost(Interface):
     canPost = Bool(title=u'Can Post',
       description=u'Can the user post the the group?',
       required=True)
@@ -16,6 +16,15 @@ class IGSPostingUser(Interface):
     status = Text(title=u'Status',
       description=u'The reason the user cannot post to the group, as '\
         u'a textual description.',)
+
+class IGSCanPostRule(ICanPost):
+    weight = Int(   title=u'Weight',
+                    description=u'The weight of this rule, used for '\
+                        u'sorting the rules.',
+                    default = 0)
+
+class IGSPostingUser(ICanPost):
+    pass
 
 class IGSUserCanPostContentProvider(IContentProvider):
     """The content provider for the context menu"""
