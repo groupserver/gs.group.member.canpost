@@ -1,0 +1,30 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:tal="http://xml.zope.org/namespaces/tal"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:use-macro="context/@@groupserver_site_home_layout/page">
+  <head>
+    <title metal:fill-slot="title">Posting Rules:
+      <span tal:replace="string:${view/groupInfo/name}: ${view/siteInfo/name}"/>
+    </title>
+    <!--TODO: Metadata-->
+  </head>
+  <body>
+    <tal:block metal:fill-slot="body">
+      <h1>Posting Rules</h1>
+      <p>Below are the posting rules for 
+        <span tal:content="view/groupInfo/name">this group</span>.
+        They only cover the rules that are enforced by the GroupServer
+        software that runs this group. 
+        It does not list the rules that the group administrators may
+        enforce.
+      </p>
+      <dl tal:repeat="adaptor view/canPost/adaptors">
+        <dt tal:content="python:adaptor[0]">Name</dt>
+        <dd tal:define="rule python:adaptor[1]">
+          <span tal:content="rule/__doc__">Rule</span>
+          (Weight: <span tal:content="rule/weight">w</span>)</dd>
+      </dl>
+    </tal:block>
+  </body>
+</html>
+

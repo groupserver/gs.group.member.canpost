@@ -4,8 +4,34 @@
   xmlns:rdb="http://namespaces.zope.org/rdb"
   xmlns:sqlos="http://namespaces.sqlobject.org/sqlos"
   xmlns:five="http://namespaces.zope.org/five">
+  
+  <!--Posting User Adaptor--><!--=mpj17= New-->
+  <adapter
+    for="Products.CustomUserFolder.interfaces.IGSUserInfo 
+      gs.group.base.interfaces.IGSGroupMarker"
+    provides="gs.group.member.canpost.interfaces.IGSPostingUser" 
+    factory=".canpost.CanPostToGroup" />
+  
+  <!--Some basic rules. Note: The name is important, so that a *named*
+    -   adaptor is created. -->
+  <!--  Blocked from Posting-->
+  <adapter
+    name="Blocked from Posting"
+    for="Products.CustomUserFolder.interfaces.IGSUserInfo 
+      gs.group.base.interfaces.IGSGroupMarker"
+    provides=".interfaces.IGSCanPostRule" 
+    factory=".rules.BlockedFromPosting"  />
 
-  <!--Posting User Adaptor-->
+  <!--The list of posting rules in the group.-->
+  <browser:page
+    for="gs.group.base.interfaces.IGSGroupMarker"
+    name="rules-list.html"
+    class=".ruleslist.PostingRules"
+    template="browser/templates/ruleslist.pt"
+    permission="zope2.View"/>
+
+  
+  <!--Posting User Adaptor--><!--=mpj17= old-->
   <class class=".usercanpost.GSGroupMemberPostingInfo">
       <implements interface=".interfaces.IGSPostingUser" />
   </class>

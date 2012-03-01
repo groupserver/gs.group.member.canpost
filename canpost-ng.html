@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.7: http://docutils.sourceforge.net/" />
+<title>User Can Post: The Next Generation</title>
+<meta name="authors" content="Michael JasonSmith" />
+<meta name="date" content="2011-11-22" />
+<meta name="organization" content="GroupServer.org" />
+<meta name="copyright" content="This document is licensed under a Creative Commons Attribution-Share Alike 3.0 New Zealand License by OnlineGroups.Net." />
+<link rel="stylesheet" href="http://groupserver.org/++resource++globalstyle-20110714.css" type="text/css" />
+</head>
+<body>
+<div class="document" id="user-can-post-the-next-generation">
+<div id="bodyblock">
+<div id="divisionHomeContent">
+<h1 class="title">User Can Post: The Next Generation</h1>
+<table class="docinfo" frame="void" rules="none">
+<col class="docinfo-name" />
+<col class="docinfo-content" />
+<tbody valign="top">
+<tr><th class="docinfo-name">Authors:</th>
+<td>Michael JasonSmith</td></tr>
+<tr><th class="docinfo-name">Contact:</th>
+<td>Michael JasonSmith &lt;<a class="reference external" href="mailto:mpj17&#64;onlinegroups.net">mpj17&#64;onlinegroups.net</a>&gt;</td></tr>
+<tr><th class="docinfo-name">Date:</th>
+<td>2011-11-22</td></tr>
+<tr><th class="docinfo-name">Organization:</th>
+<td><a class="first last reference external" href="http://groupserver.org">GroupServer.org</a></td></tr>
+<tr><th class="docinfo-name">Copyright:</th>
+<td>This document is licensed under a
+<a class="reference external" href="http://creativecommons.org/licenses/by-sa/3.0/nz/">Creative Commons Attribution-Share Alike 3.0 New Zealand License</a>
+by <a class="reference external" href="http://onlinegroups.net">OnlineGroups.Net</a>.</td></tr>
+</tbody>
+</table>
+<p>The User Can Post code (<tt class="docutils literal">gs.group.member.canpost</tt>) decides if a group
+member can post. In this document I present a proposed new structure
+for the User Can Post code. I begin by outlining the <a class="reference internal" href="#rules">rules</a> that have
+to be implemented, and then summarise how the existing system works
+(see <a class="reference internal" href="#old-system">old system</a> below). I then present my proposed <a class="reference internal" href="#new-system">new system</a>.</p>
+<div class="section" id="rules">
+<h1>1&nbsp;&nbsp;&nbsp;Rules</h1>
+<p>[Taken from the README in <tt class="docutils literal">gs.group.member.canpost</tt>.]</p>
+<p>A person can post if one of two sets of rules are met. One rule is for <a class="reference internal" href="#unclosed-groups">unclosed groups</a>, the other is for <a class="reference internal" href="#closed-groups">closed groups</a>.</p>
+<div class="section" id="unclosed-groups">
+<h2>1.1&nbsp;&nbsp;&nbsp;Unclosed Groups</h2>
+<p>The first rule is that the someone can post if he or he is not blocked
+from posting and the group is <em>unclosed</em>.</p>
+<dl class="docutils">
+<dt>Blocked from posting</dt>
+<dd>A member is blocked from posting if he or she has been added to the
+<tt class="docutils literal">blocked_members</tt> list.</dd>
+<dt>Email Blacklist</dt>
+<dd>Posting from a particular email address is banned if the address is
+listed in the <tt class="docutils literal">email_blacklist</tt> table.</dd>
+<dt>The group is unclosed</dt>
+<dd>Support groups allow anyone who is not blocked to post, even if the
+person posting does not have a profile. Due to the Teutonic heritage
+of GroupServer, such groups are known as <tt class="docutils literal">unclosed</tt>.</dd>
+</dl>
+</div>
+<div class="section" id="closed-groups">
+<h2>1.2&nbsp;&nbsp;&nbsp;Closed Groups</h2>
+<p>The second rule is that a person can post if all of the following
+conditions are met. This is the most common check, because most groups
+are closed.</p>
+<dl class="docutils">
+<dt>Blocked from posting</dt>
+<dd>A member is blocked from posting if he or she has been added to the
+<tt class="docutils literal">blocked_members</tt> list.</dd>
+<dt>Email Blacklist</dt>
+<dd>Posting from a particular email address is banned if the address is
+listed in the <tt class="docutils literal">email_blacklist</tt> table.</dd>
+<dt>The group is closed</dt>
+<dd>Most groups are closed: only members can post.</dd>
+<dt><em>Not</em> anonymous</dt>
+<dd>Only people with profiles can post to closed groups.</dd>
+<dt>Group member</dt>
+<dd>The person posting must be a member of the group in order to post.</dd>
+<dt>Has preferred email addresses</dt>
+<dd>To post to a group the member must have at least one verified email
+address. This rule exists to prevent people from partially creating
+a profile and then posting to a group.</dd>
+<dt>The maximum posting rate has <em>not</em> been hit</dt>
+<dd>GroupServer can limit the rate that members can post. This prevents
+trite and trivial messages (&quot;me too!&quot;) from being posted. The
+posting rate only applies to normal members: participation coaches
+and administrators are not subject to the posting rate.</dd>
+<dt>Member has the required properties</dt>
+<dd>All required profile properties must be provided before a member can
+post. There are two types of required properties: those that are
+required by the site, and those that are required for the group.</dd>
+</dl>
+</div>
+</div>
+<div class="section" id="old-system">
+<h1>2&nbsp;&nbsp;&nbsp;Old System</h1>
+<p>The old system implemented a monolithic whole. The <tt class="docutils literal">GSGroupMemberPostingInfo</tt> class both checks to see if the group member can post, and provides a status message if the group member cannot post. The core check is carried out by a giant Boolean statement:</p>
+<pre class="literal-block">
+not(self.user_blocked_from_posting()) and\
+    (self.group_is_unclosed() or\
+        ((not(self.user_anonymous()) and\
+            self.user_is_member() and\
+            self.user_has_preferred_email_addresses() and\
+            self.user_is_posting_member() and\
+            not(self.user_posting_limit_hit()) and\
+            self.user_has_required_properties())))
+</pre>
+<p>The statement is made up of two parts — one for the unclosed group,
+and one for the closed group — separated with an <tt class="docutils literal">or</tt>. Within
+each the two parts a series of rules are written, separated by some
+<tt class="docutils literal">and</tt> expressions.</p>
+<p>The rules themselves are methods of the <tt class="docutils literal">GSGroupMemberPostingInfo</tt>
+class.</p>
+</div>
+<div class="section" id="new-system">
+<h1>3&nbsp;&nbsp;&nbsp;New System</h1>
+<p>I propose creating a system that made use of <a class="reference external" href="http://docs.zope.org/zope.component/README.html#adapters">adapters</a>. The
+adapter would take a group and a group member, just like the current
+<tt class="docutils literal">GSGroupMemberPostingInfo</tt> class. However, different types of groups
+would have different adapter. This would allow different rules for</p>
+<blockquote>
+<ul class="simple">
+<li>Support groups, which are <tt class="docutils literal">unclosed</tt>,</li>
+<li>Standard discussion groups, which are <tt class="docutils literal">closed</tt>, and</li>
+<li>Announcement groups (see <a class="reference external" href="http://projects.iopen.net/groupserver/ticket/613">Ticket 613</a>).</li>
+</ul>
+</blockquote>
+<p>These adapters would provide an interface that is similar to the
+existing code:</p>
+<pre class="literal-block">
+class IGSPostingUser(Interface):
+    canPost = Bool(title=u'Can Post',
+      description=u'Can the user post the the group?',
+      required=True)
+
+    statusNum = Int(title=u'Status Number',
+      description=u'The reason the user cannot post to the group, '\
+        u'as a number. 0 if the user can post.',
+      required=True)
+
+    status = Text(title=u'Status',
+      description=u'The reason the user cannot post to the group, '\
+        u'as a textual description.',)
+</pre>
+<p>Internally the rules would be implemented by a series of other
+adapters. They would be acquired by a query for some named adapters
+that support a particular interface. This will allow the code to be
+shared between the three main adapters. For example, the check for a
+blocked email address should be done at site-level, and carried out by
+all groups. Another shared block of code could be for a <em>closed group</em>
+(see <a class="reference external" href="http://projects.iopen.net/groupserver/ticket/449">Ticket 449</a>).</p>
+<p>The adapters that implement the rules will have to be sortable. In
+this respect they are similar to the viewlets that make up the tabs
+on the group pages. (The Can Post adapters would be similar to the
+viewlet managers). The adapter must also be able to generate a string,
+describing the reason that the person was blocked.</p>
+<!-- Resources -->
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
