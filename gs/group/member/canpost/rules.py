@@ -1,5 +1,6 @@
 # coding=utf-8
 from zope.cachedescriptors.property import Lazy
+from zope.component import createObject
 from Products.GSGroup.interfaces import IGSGroupInfo
 
 class BaseRule(object):
@@ -14,6 +15,11 @@ class BaseRule(object):
     @Lazy
     def groupInfo(self):
         return IGSGroupInfo(self.group)
+
+    @Lazy
+    def siteInfo(self):
+        retval = createObject('groupserver.SiteInfo', self.group)
+        return retval
             
     @Lazy
     def mailingList(self):
@@ -46,7 +52,7 @@ class BlockedFromPosting(BaseRule):
     weight = 10
             
     def check(self):
-        if not self.__checked:
+        if not self.s['checked']:
             ml = self.mailingList
             blockedMemberIds = ml.getProperty('blocked_members', [])
             if (self.userInfo.id in blockedMemberIds):
@@ -57,6 +63,9 @@ class BlockedFromPosting(BaseRule):
                 self.s['canPost'] = True
                 self.s['status'] = u'not blocked from posting'
                 self.s['statusNum'] = 0
+            self.s['checked'] = True
+
+        assert self.s['checked']
         assert type(self.s['canPost']) == bool
         assert type(self.s['status']) == unicode
         assert type(self.s['statusNum']) == int
