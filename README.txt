@@ -1,92 +1,164 @@
 Introduction
 ============
 
-This is the code for determining if a group member can post. Both
+This is the core code for determining if a group member can post. Both
 the mailing list code (``Products.XWFMailingListManager``) and the web
-interface (``gs.group.messages.topic``) rely on this code for determining
-if a member can post.
+interface (``gs.group.messages.topic``) rely on this code for 
+determining if a member can post.
+
+In this document I discuss the structure of a `rule`_, and how the
+`Can Post Adaptor`_ is used to collect the rules for each group.  
+Finally I provide an example of `chaining rules`_.
+
+See the ``gs.group.type.discussion`` group for a real-life 
+implementation of some posting rules.
 
 Rule
 ====
 
-A person can post if one of two rules are met. One rule is for 'unclosed'
-groups, the other is for closed groups.
+A rule is an adaptor. It takes a user [#userType]_ and a group
+[#groupType]_. It provides three properties:
 
-Unclosed
+``canPost``
+  A Boolean value that is ``True`` if this rule thinks that the user
+  can post the the group.
+
+``status``
+  A Unicode value that summaries why the user should be prevented from
+  posting to the group.
+  
+``statusNum``
+  An integer value that uniquely identifies the rule. It is ``0`` if 
+  the user can post to the group; it is  ``-1`` if it is unknown whether
+  the user can post to the group.
+  
+In practice most rules inherit from the ``BaseRule`` abstract 
+base-class. It provides three methods decorated with ``@Lazy`` to 
+provide the three properties [#BaseRule]_. To make a concrete rule three
+things are needed:
+
+#.  `The check method`_, 
+#.  Some `constants`_, and
+#.  `The ZCML`_.
+
+The ``check`` Method
+--------------------
+
+The ``check`` method of a rule performs the actual check to see if a
+user can post to a group. Based on the result it sets the values in
+the dictionary ``self.s``. This dictionary is then used to provide the
+return values for the three properties of the rule.
+
+For example, the ``BlockedFromPosting`` rule checks to see if the 
+identifier of the user is in the ``blocked_members`` property of the
+mailing list. It then sets the ``canPost``, ``status`` and
+``statusNum`` values of the ``self.s`` dictionary accordingly. Finally,
+it sets ``self.s['checked']`` to ``True``. This prevents the system 
+from performing the check more than once.
+
+Constants
+---------
+
+Each rule must provide a ``__doc__`` and a ``weight``. 
+
+The doc-string (``__doc__``) is used to provide documentation on the 
+rule, which is shown on the page ``rules.html`` in each group.
+
+The ``weight`` is used for two things. First, the `can post adaptor`_ 
+uses it to sort rules, and determine the order that the rules should 
+be checked [#Viewlets]_. Each weight should be unique, to prevent
+ambiguity. Because of this the weights provide a very useful value for
+the ``statusNum`` of each rule.
+
+The ZCML
 --------
 
-The first rule is that the someone can post if he or he is not blocked
-from posting and the group is 'unclosed'.
+The ZCML sets up each rule as an adaptor [#WhyZCML]_. It adapts a
+``userInfo`` and the *specific* group type and provides an
+``IGSCanPostRule``. The adaptor must be a **named adaptor**, as multiple
+rules are used for each group. The names are also shown on the
+``rules.html`` page in each group.
 
-*Not* blocked from posting
-  A member can be added to the ``blocked_members`` list. If this occurs 
-  then the member is blocked from posting.
-  
-The group is unclosed
-  Support groups allow anyone who is not blocked to post, even if the
-  person posting does not have a profile. Due to the Teutonic heritage
-  of GroupServer, such groups are known as ``unclosed``.
+Can Post Adaptor
+================
 
-Closed
-------
+The ``CanPost`` adaptor looks very very very much like the adaptor for
+a `rule`_. However, rather than providing a single rule it *aggregates*
+all the rules for a group, giving the final answer as to weather the 
+user can post. It provides the answer using the same three properties as
+the rules: ``canPost``, ``status`` and ``statusNum``.
 
-The second rule is that a person can post if all of the following
-conditions are met. This is the most common check, because most groups
-are closed.
+The core of the ``CanPost`` code are two loops. The first gets all the
+rules for the current group::
 
-The group is closed
-  Most groups are closed: only members can post. 
+    retval = [a for a in gsm.getAdapters((self.userInfo, self.group), 
+                                          IGSCanPostRule)]
 
-*Not* anonymous
-  Only people with profiles can post to closed groups.
-  
-Group member
-  The person posting must be a member of the group in order to post.
-  
-Has preferred email addresses
-  To post to a group the member must have at least one verified email
-  address. This rule exists to prevent people from partially creating
-  a profile and then posting to a group.
+This is later sorted by the ``weight`` of each rule (see `constants`_).
 
-The maximum posting rate has *not* been hit
-  GroupServer can limit the rate that members can post. This prevents
-  trite and trivial messages ("me too!") from being posted. The
-  posting rate only applies to normal members: participation coaches
-  and administrators are not subject to the posting rate.
+The second loop determines if the user can post::
 
-Member has the required properties
-  All required profile properties must be provided before a member can
-  post. There are two types of required properties: those that are 
-  required by the site, and those that are required for the group.
+    reduce(and_, [rule.canPost for rule in self.rules], True)
 
-Testing
-=======
+Only one ``CanPost`` adaptor is needed for *all* group-types. That is
+because the first loop will retrieve only the rules that are specific
+to the current group-type.
 
-The table below summarises the correct results from the most basic test
-that should be carried out if the can post code is changed.
+Chaining Rules
+==============
 
-============= ====== ========== ======== ========
-Group Privacy Member Non Member Admin    Anon
-============= ====== ========== ======== ========
-Public        Post   Not Post   Not Post Not post
-Private       Post   NA         Not Post NA
-Secret        Post   NA         Not Post NA
-============= ====== ========== ======== ========
+The core GroupServer group types use the following inheritance 
+hierarchy for their interfaces::
 
-Post
-  The person viewing the page sees the interfaces that allows him or
-  her to post
-  
-Not Post
-  The member sees messages saying that he or she cannot post.
+  gs.group.base.interfaces.IGSGroupMarker
+     △        △
+     │        │
+     │       gs.group.type.discussion.interfaces.IGSDiscussionGroup
+     │        △
+     │        │
+     │       gs.group.type.announcement.interfaces.IGSAnnouncementGroup
+     │
+    gs.group.type.support.interfaces.IGSSupportGroup
 
-NA
-  The person should not even get so far as seeing the can post 
-  information. Therefore this test is not applicable.
 
-Todo
-----
+This egg (``gs.group.member.canpost``) provides one rule, for the
+``IGSGroupMarker`` — which prevents people who have been explicitly 
+blocked from posting. All other group types inherit this rule because
+their marker-interfaces inherit from the ``IGSGroupMarker``.
 
-Add tests for group administrators. Should group administrators 
-automatically be considered posting members?
+The discussion group (``IGSDiscussionGroup``) provides the most rules:
+six in all. All these rules are inherited by the announcement group 
+because its marker-interface (``IGSAnnouncementGroup``) inherits from
+the discussion group. The announcement group also provides its own rule,
+to ensure that only posting members can post.
+
+The support group (``IGSSupportGroup``) provides no extra rules, so it
+just has the rule that is provided by this package for all the
+``IGSGroupMarker`` groups.
+
+..  [#userType] The user is almost always a 
+    ``Products.CustomUserFolder.interfaces.IGSUserInfo`` instance.
+
+..  [#groupType] The group will be a group-folder that has been marked
+    with an interface that is *generally* specific to the type of group.
+
+..  [#BaseRule] The ``BaseRule`` also supplies four other useful 
+    properties: 
+
+    * A ``userInfo``, 
+    * A ``groupInfo``, 
+    * A ``siteInfo`` and 
+    * A ``mailingListInfo``. 
+    
+    It also initialises the dictionary ``self.s`` that the ``canPost``, 
+    ``status`` and ``statusNum`` properties check.
+
+..  [#Viewlets] The use of a ``weight`` to sort the rules was taken from
+    the ``zope.viewlet`` code. Indeed, the entire structure of this 
+    system was inspired by that code.
+
+..  [#whyZCML] It easier to use ZCML to set up the adaptor for each rule
+    because rules can be mixed and matched by different group-types. By
+    using ZCML the mixing-and-matching can be done with very little 
+    Python code.
 
