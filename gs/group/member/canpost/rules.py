@@ -4,6 +4,7 @@ from zope.component import createObject
 from Products.GSGroup.interfaces import IGSGroupInfo
 
 class BaseRule(object):
+    weight = None
     def __init__(self, userInfo, group):
         self.userInfo = userInfo
         self.group = group
@@ -34,17 +35,29 @@ class BaseRule(object):
     @Lazy
     def canPost(self):
         self.check()
-        return self.s['canPost']
+        retval = self.s['canPost']
+        assert type(retval) == bool
+        return retval
     
     @Lazy
     def status(self):
         self.check()
-        return self.s['status']
+        retval = self.s['status']
+        assert type(retval) == unicode
+        return retval
 
     @Lazy
     def statusNum(self):
         self.check()
-        return self.s['statusNum']
+        retval = self.s['statusNum']
+        assert retval in (-1, 0, self.weight), \
+            'self.statusNum is "%s", not in range: -1, 0, %s' % \
+            (retval, self.weight)
+        assert (retval in (-1, self.weight) and (not self.canPost)) \
+                or ((retval == 0) and self.canPost), 'Mismatch between '\
+                'self.statusNum "%s" and self.canPost "%s"' %\
+                (retval, self.canPost)
+        return retval
 
 class BlockedFromPosting(BaseRule):
     u'''A person will be prevented from posting if he or she is 
