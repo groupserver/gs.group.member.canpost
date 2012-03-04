@@ -17,7 +17,14 @@ Rule
 ====
 
 A rule is an adaptor. It takes a user [#userType]_ and a group
-[#groupType]_. It provides three properties:
+[#groupType]_. It provides four properties.
+
+``weight``
+  An integer that has two related functions. First, it is used as the
+  sort-key to determine the order that the rules are checked (see
+  `can post adaptor`_ below). Second, it uniquely identifies the rule.
+  (No two rules should have the same weight as this can lead to 
+  ambiguity.)
 
 ``canPost``
   A Boolean value that is ``True`` if this rule thinks that the user
@@ -28,9 +35,13 @@ A rule is an adaptor. It takes a user [#userType]_ and a group
   posting to the group.
   
 ``statusNum``
-  An integer value that uniquely identifies the rule. It is ``0`` if 
-  the user can post to the group; it is  ``-1`` if it is unknown whether
-  the user can post to the group.
+  An integer that is one of three values.
+  
+  * ``-1`` if it is unknown whether the user can post to the group
+    (``canPost`` will be ``False`` in this case),
+  * ``0`` if the user can post to the group (``canPost`` is ``True``), and
+  * Set to the ``weight`` value if the user cannot post to the group
+    (``canPost`` is ``False``).
   
 In practice most rules inherit from the ``BaseRule`` abstract 
 base-class. It provides three methods decorated with ``@Lazy`` to 
@@ -151,7 +162,7 @@ just has the rule that is provided by this package for all the
     * A ``mailingListInfo``. 
     
     It also initialises the dictionary ``self.s`` that the ``canPost``, 
-    ``status`` and ``statusNum`` properties check.
+    ``status`` and ``statusNum`` properties use.
 
 ..  [#Viewlets] The use of a ``weight`` to sort the rules was taken from
     the ``zope.viewlet`` code. Indeed, the entire structure of this 
