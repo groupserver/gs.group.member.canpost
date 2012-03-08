@@ -24,7 +24,8 @@ class BaseRule(object):
             
     @Lazy
     def mailingList(self):
-        mailingListManager = self.site_root.ListManager
+        site_root = self.group.site_root()
+        mailingListManager = site_root.ListManager
         retval = mailingListManager.get_list(self.groupInfo.id)
         return retval
 
