@@ -7,14 +7,18 @@
   
   <!--Posting User Adaptor--><!--=mpj17= New-->
   <adapter
-    for="Products.CustomUserFolder.interfaces.IGSUserInfo 
-      gs.group.base.interfaces.IGSGroupMarker"
-    provides="gs.group.member.canpost.interfaces.IGSPostingUser" 
+    for="gs.group.base.interfaces.IGSGroupMarker
+          Products.CustomUserFolder.interfaces.IGSUserInfo"
+    provides=".interfaces.IGSPostingUser" 
     factory=".canpost.CanPostToGroup" />
-  
-  <!--Some basic rules. Note: The name is important, so that a *named*
-    -   adaptor is created. -->
-  <!--  Blocked from Posting-->
+  <adapter
+    for="Products.XWFChat.interfaces.IGSGroupFolder 
+         Products.CustomUserFolder.interfaces.IGSUserInfo"
+    provides=".interfaces.IGSPostingUser" 
+    factory=".canpost.CanPostToGroup" />
+
+  <!-- The basic "Blocked from Posting" rule. Note: The name is 
+    -   important, so that a *named* adaptor is created. -->
   <adapter
     name="Blocked from Posting"
     for="Products.CustomUserFolder.interfaces.IGSUserInfo 
@@ -32,13 +36,14 @@
 
   
   <!--Posting User Adaptor--><!--=mpj17= old-->
-  <class class=".usercanpost.GSGroupMemberPostingInfo">
+  <!--class class=".usercanpost.GSGroupMemberPostingInfo">
       <implements interface=".interfaces.IGSPostingUser" />
   </class>
   <adapter
     factory=".usercanpost.GSGroupMemberPostingInfo"
-    for="Products.XWFChat.interfaces.IGSGroupFolder Products.CustomUserFolder.interfaces.IGSUserInfo"
-    provides=".interfaces.IGSPostingUser" />
+    for="Products.XWFChat.interfaces.IGSGroupFolder 
+         Products.CustomUserFolder.interfaces.IGSUserInfo"
+    provides=".interfaces.IGSPostingUser" /-->
 
   <!--Content Provider-->
   <interface 
@@ -48,7 +53,9 @@
     <implements interface=".interfaces.IGSUserCanPostContentProvider"/>
   </class>
   <adapter
-    for="zope.interface.Interface zope.publisher.interfaces.browser.IDefaultBrowserLayer zope.interface.Interface"
+    for="zope.interface.Interface 
+        zope.publisher.interfaces.browser.IDefaultBrowserLayer 
+        zope.interface.Interface"
     factory=".usercanpostcontentprovider.GSUserCanPostContentProvider"
     provides="zope.contentprovider.interfaces.IContentProvider"
     name="groupserver.UserCanPost"/>

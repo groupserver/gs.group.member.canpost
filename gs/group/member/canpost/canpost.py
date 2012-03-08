@@ -7,9 +7,9 @@ from Products.CustomUserFolder.interfaces import IGSUserInfo
 from gs.group.member.canpost.interfaces import IGSPostingUser, IGSCanPostRule
 
 class CanPostToGroup(object):
-    def __init__(self, userInfo, group):
-        self.userInfo = userInfo
+    def __init__(self, group, userInfo):
         self.group = group
+        self.userInfo = userInfo
     
     @Lazy
     def adaptors(self):

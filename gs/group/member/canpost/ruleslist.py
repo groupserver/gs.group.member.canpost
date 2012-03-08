@@ -8,7 +8,7 @@ class PostingRules(GroupPage):
     
     @Lazy
     def canPost(self):
-        retval = getMultiAdapter((self.loggedInUserInfo, self.context), 
+        retval = getMultiAdapter((self.context, self.loggedInUserInfo), 
                     IGSPostingUser)
         return retval
 
