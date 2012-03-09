@@ -1,3 +1,3 @@
 # coding=utf-8
-# This space intentionally left blank.
+from viewlet import RuleViewlet
 
