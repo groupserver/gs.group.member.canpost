@@ -1,4 +1,5 @@
 # coding=utf-8
+from urllib import urlencode, quote_plus
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject
 from zope.app.pagetemplate import ViewPageTemplateFile
@@ -57,6 +58,13 @@ class GSUserCanPostContentProvider(GroupContentProvider):
         assert self.request.URL
         retval = '/login.html?came_from=%s' % self.request.URL
         assert retval
+        return retval
+
+    @Lazy
+    def signupUrl(self):
+        d = {   'form.came_from': self.request.URL,
+                'form.groupId': self.groupInfo.id}
+        retval = '/request_registration.html?%s' % urlencode(d)
         return retval
         
     @Lazy
