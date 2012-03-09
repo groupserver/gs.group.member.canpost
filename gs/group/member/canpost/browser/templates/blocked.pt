@@ -1,10 +1,10 @@
 <div id="gs-group-member-canpost-info-blocked" 
   class="gs-group-member-canpost-info">
-  <strong>You cannot post</strong> because you have been 
-  <strong title="#"
-    tal:attributes="title string:Reason ${view/canPost/statusNum}">blocked</strong> 
-  from posting.
-  Contact the group administrator  to discuss why you are blocked from 
+  <strong 
+    tal:attributes="title string:Reason ${view/canPost/statusNum}">You 
+    cannot post</strong> 
+  because you have been <strong>blocked</strong> from posting.
+  Contact the group administrator to discuss why you are blocked from 
   posting to
   <span class="group"
     tal:content="view/groupInfo/name">this group</span>.
