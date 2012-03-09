@@ -47,7 +47,6 @@
     class=".viewlet.BlockedRuleViewlet"
     permission="zope2.View" />
 
-
   <!--Content Provider: OLD-->
   <interface 
     interface=".interfaces.IGSUserCanPostContentProvider"
