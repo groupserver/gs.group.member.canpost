@@ -34,18 +34,21 @@
     template="browser/templates/ruleslist.pt"
     permission="zope2.View"/>
 
-  
-  <!--Posting User Adaptor--><!--=mpj17= old-->
-  <!--class class=".usercanpost.GSGroupMemberPostingInfo">
-      <implements interface=".interfaces.IGSPostingUser" />
-  </class>
-  <adapter
-    factory=".usercanpost.GSGroupMemberPostingInfo"
-    for="Products.XWFChat.interfaces.IGSGroupFolder 
-         Products.CustomUserFolder.interfaces.IGSUserInfo"
-    provides=".interfaces.IGSPostingUser" /-->
+  <!--The viewlets: NEW-->
+  <browser:viewletManager
+    name="groupserver.CanPost"
+    permission="zope2.View"
+    provides=".interfaces.ICanPostInfo"
+    class=".viewletmanager.CanPostViewletManager"
+    template="browser/templates/canpostinfo.pt"/>
+  <browser:viewlet name="gs-group-member-canpost-blocked-viewlet"
+    manager=".interfaces.ICanPostInfo"
+    template="browser/templates/blocked.pt"
+    class=".viewlet.BlockedRuleViewlet"
+    permission="zope2.View" />
 
-  <!--Content Provider-->
+
+  <!--Content Provider: OLD-->
   <interface 
     interface=".interfaces.IGSUserCanPostContentProvider"
     type="zope.contentprovider.interfaces.ITALNamespaceData"/>

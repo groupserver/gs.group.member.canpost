@@ -1,7 +1,8 @@
 # coding=utf-8
+from zope.contentprovider.interfaces import IContentProvider
 from zope.interface.interface import Interface
 from zope.schema import Bool, Choice, Int, Text, TextLine
-from zope.contentprovider.interfaces import IContentProvider
+from zope.viewlet.interfaces import IViewletManager
 
 class ICanPost(Interface):
     canPost = Bool(title=u'Can Post',
@@ -45,4 +46,7 @@ class IGSUserCanPostContentProvider(IContentProvider):
         u'status message.',
       required=False,
       default=u"browser/templates/canpost.pt") 
+
+class ICanPostInfo(IViewletManager):
+    u'''The viewlet manager for the Can Post information'''
 

@@ -1,0 +1,7 @@
+<div id="gs-group-member-canpost-info" >
+  <tal:block repeat="viewlet options/viewlets">
+    <tal:block
+      content="structure viewlet/render">Content</tal:block>
+  </tal:block>
+</div><!--gs-group-member-canpost-info-->
+
