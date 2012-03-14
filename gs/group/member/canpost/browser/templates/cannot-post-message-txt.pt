@@ -1,0 +1,18 @@
+<tal:block define="userInfo options/userInfo | view/loggedInUserInfo;">Dear <tal:block content="userInfo/name">Member</tal:block>,
+
+<tal:block 
+  define="m string:There was a problem posting a message to ${view/groupInfo/name}. Below is some information on the problem. Your original message is attached to this email."
+  content="python:view.format_message(m)">stuff</tal:block>
+
+<tal:block
+  define="s provider:groupserver.CanPost;
+    m python:view.cp_to_txt(s);"
+  content="structure python:view.format_message(m)">stuff</tal:block>
+
+If you have any problems, email us at  
+<tal:block content="view/siteInfo/get_support_email">this address</tal:block>
+
+Kind regards
+  The <tal:block content="view/siteInfo/name">Site</tal:block> Team
+</tal:block>
+
