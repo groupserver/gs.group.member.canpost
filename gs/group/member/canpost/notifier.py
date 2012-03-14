@@ -47,19 +47,13 @@ class NotifyNewAdmin(object):
 class CannotPostMessage(GroupPage):
     @Lazy
     def supportAddress(self):
-        print 'Here 1'
         gn = self.groupInfo.name.encode('ascii', 'ignore')
-        print 'Here 2'
         sn = self.siteInfo.name.encode('ascii', 'ignore')
-        print 'Here 3'
         d = {'Subject': 'Cannot Post to %s' % gn,
             'body': 'Hi!\n\nThere I had a problem sending a post to'\
                     '%s on %s.' % (gn, sn)}
-        print 'Here 4'
         e = get_support_email(self.context, self.siteInfo.id)
-        print 'Here 5'
         retval = 'mailto:%s?%s' % (e, urlencode(d))
-        print 'Here 6'
         return retval
     # CanPost adaptor
 
