@@ -47,6 +47,20 @@
     class=".viewlet.BlockedRuleViewlet"
     permission="zope2.View" />
 
+  <!--Notifications-->
+  <browser:page
+    for="gs.group.base.interfaces.IGSGroupMarker"
+    name="cannot-post.html"
+    class=".notifier.CannotPostMessage"
+    template="browser/templates/cannot-post-message.pt"
+    permission="zope2.View"/>
+  <browser:page
+    for="gs.group.base.interfaces.IGSGroupMarker"
+    name="cannot-post.txt"
+    class=".notifier.CannotPostMessageText"
+    template="browser/templates/cannot-post-message-txt.pt"
+    permission="zope2.View"/>
+
   <!--Content Provider: OLD-->
   <interface 
     interface=".interfaces.IGSUserCanPostContentProvider"
