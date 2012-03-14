@@ -1,10 +1,12 @@
 # coding=utf-8
-from urllib import urlencode
+from urllib import quote
+from textwrap import TextWrapper
 from zope.component import createObject, getMultiAdapter
 from zope.cachedescriptors.property import Lazy
 from Products.XWFCore.XWFUtils import get_support_email
 from gs.group.base.page import GroupPage
 from gs.profile.notify.sender import MessageSender
+from interfaces import IGSPostingUser
 UTF8 = 'utf-8'
 
 class NotifyNewAdmin(object):
@@ -48,14 +50,28 @@ class CannotPostMessage(GroupPage):
     @Lazy
     def supportAddress(self):
         gn = self.groupInfo.name.encode('ascii', 'ignore')
-        sn = self.siteInfo.name.encode('ascii', 'ignore')
-        d = {'Subject': 'Cannot Post to %s' % gn,
-            'body': 'Hi!\n\nThere I had a problem sending a post to'\
-                    '%s on %s.' % (gn, sn)}
+        s = 'Subject=%s' % quote('Cannot Post to %s' % gn)
+        b = 'body=%s' % quote(self.messageBody)
         e = get_support_email(self.context, self.siteInfo.id)
-        retval = 'mailto:%s?%s' % (e, urlencode(d))
+        retval = 'mailto:%s?%s&%s' % (e, b, s)
         return retval
-    # CanPost adaptor
+    
+    @Lazy
+    def messageBody(self):
+        gn = self.groupInfo.name.encode('ascii', 'ignore')
+        sn = self.siteInfo.name.encode('ascii', 'ignore')
+        m = 'I had a problem sending an email to %s on %s <%s>. '\
+            'The issue was "%s."' % \
+            (gn, sn, self.groupInfo.url, self.canPost.status)
+        retval = 'Hi!\n\n%s\n\nI need your help because...' % TextWrapper().fill(m)
+        return retval
+    
+    @Lazy
+    def canPost(self):
+        group = self.groupInfo.groupObj
+        retval = getMultiAdapter((group, self.loggedInUserInfo), 
+                    IGSPostingUser)
+        return retval
 
 class CannotPostMessageText(CannotPostMessage):
     def __init__(self, context, request):

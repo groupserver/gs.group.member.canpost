@@ -20,11 +20,11 @@
       There was a problem posting a message to
       <span tal:content="view/groupInfo/name">This Group</span>.
       Below is some information on the problem.
-      Your original message is attached.
+      Your original message is attached to this email.
     </p>
-    <!--p style="margin: 1.385em 0 1.385em 0;"
-      tal:content="structure provider:groupserver.CanPost">
-    </p-->
+    <p tal:replace="structure provider:groupserver.CanPost">
+      Woo
+    </p>
     <!--Troubleshooting/return/warranty/damage information-->
     <p style="margin: 1.385em 0 1.385em 0;">
       If you have any problems, email us at 
