@@ -2,19 +2,26 @@ Introduction
 ============
 
 This is the core code for determining if a group member can post. Both
-the mailing list code (``Products.XWFMailingListManager``) and the web
+the mailing list code (``Products.XWFMailingListManager``) and the Topic
 interface (``gs.group.messages.topic``) rely on this code for 
 determining if a member can post.
 
-In this document I discuss the structure of a `rule`_, and how the
-`Can Post Adaptor`_ is used to collect the rules for each group.  
-Finally I provide an example of `chaining rules`_.
+In this document I present how the `rules`_ for posting are created for
+each different type of group. I then discuss the `viewlets`_ and the
+`notification`_ that is sent to those that cannot post.
 
 See the ``gs.group.type.discussion`` group for a real-life 
 implementation of some posting rules.
 
-Rule
-====
+Rules
+=====
+
+In this section I present the structure of `a single rule`_, and how the
+`Can Post adaptor`_ is used to collect the rules for each group.  I then
+provide an example of `chaining rules`_.
+
+A Single Rule
+-------------
 
 A rule is an adaptor. It takes a user [#userType]_ and a group
 [#groupType]_. It provides four properties.
@@ -53,7 +60,7 @@ things are needed:
 #.  `The ZCML`_.
 
 The ``check`` Method
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 The ``check`` method of a rule performs the actual check to see if a
 user can post to a group. Based on the result it sets the values in
@@ -68,7 +75,7 @@ it sets ``self.s['checked']`` to ``True``. This prevents the system
 from performing the check more than once.
 
 Constants
----------
+~~~~~~~~~
 
 Each rule must provide a ``__doc__`` and a ``weight``. 
 
@@ -82,7 +89,7 @@ ambiguity. Because of this the weights provide a very useful value for
 the ``statusNum`` of each rule.
 
 The ZCML
---------
+~~~~~~~~
 
 The ZCML sets up each rule as an adaptor [#WhyZCML]_. It adapts a
 ``userInfo`` and the *specific* group type and provides an
@@ -91,13 +98,13 @@ rules are used for each group. The names are also shown on the
 ``rules.html`` page in each group.
 
 Can Post Adaptor
-================
+----------------
 
 The ``CanPost`` adaptor looks very very very much like the adaptor for
-a `rule`_. However, rather than providing a single rule it *aggregates*
-all the rules for a group, giving the final answer as to weather the 
-user can post. It provides the answer using the same three properties as
-the rules: ``canPost``, ``status`` and ``statusNum``.
+`a single rule`_. However, rather than providing a single rule it
+*aggregates* all the rules for a group, giving the final answer as to
+weather the user can post. It provides the answer using the same three
+properties as the rules: ``canPost``, ``status`` and ``statusNum``.
 
 The core of the ``CanPost`` code are two loops. The first gets all the
 rules for the current group::
@@ -116,7 +123,7 @@ because the first loop will retrieve only the rules that are specific
 to the current group-type.
 
 Chaining Rules
-==============
+--------------
 
 The core GroupServer group types use the following inheritance 
 hierarchy for their interfaces::
@@ -147,6 +154,39 @@ The support group (``IGSSupportGroup``) provides no extra rules, so it
 just has the rule that is provided by this package for all the
 ``IGSGroupMarker`` groups.
 
+Viewlets
+========
+
+Each rule will need a viewlet that provides feedback about why a person
+cannot post. The code for each viewlet is relatively simple:
+
+* Each viewlet inherits from
+  ``gs.group.member.canpost.viewlet.RuleViewlet``,
+
+* The ``weight`` for each viewlet is taken from the weight for the
+  respective rule, and
+
+* The ``show`` attribute is set from::
+
+    self.canPost.statusNum == self.weight``
+
+The viewlets appear in two places. First, they are shown at the bottom 
+of the Topic page if the person viewing the page cannot post. Second,
+they are shown in the `notification`_. 
+
+Notification
+============
+
+The Cannot Post notification is sent out to people who post to the 
+group, but the can-post check blocks post. The notification contains the
+`viewlets`_ [#NotificationViewlets]_. As such care should be taken to
+ensure that each viewlet makes sense outside the context of the group,
+and all links in each viewlet are **absolute** links that include the
+site name.
+
+The Cannot Post notification can be previewed by viewing the pages
+``cannot-post.html`` and ``cannot-post.txt`` within each group.
+
 ..  [#userType] The user is almost always a 
     ``Products.CustomUserFolder.interfaces.IGSUserInfo`` instance.
 
@@ -172,4 +212,8 @@ just has the rule that is provided by this package for all the
     because rules can be mixed and matched by different group-types. By
     using ZCML the mixing-and-matching can be done with very little 
     Python code.
+
+..  [#NotificationViewlets] The Cannot Post notification contains each
+    viewlet in two forms: the normal HTML version, and a plain-text
+    version, which the notification generates from the HTML.
 
