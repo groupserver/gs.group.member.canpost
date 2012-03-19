@@ -13,6 +13,12 @@ class CanPostViewletManager(WeightOrderedViewletManager):
         return retval
         
     @Lazy
+    def userInfo(self):
+        retval = getattr(self, 'passedInUserInfo', self.loggedInUserInfo)
+        assert retval
+        return retval
+        
+    @Lazy
     def groupInfo(self):
         retval = createObject('groupserver.GroupInfo', self.context)
         return retval
@@ -20,7 +26,7 @@ class CanPostViewletManager(WeightOrderedViewletManager):
     @Lazy
     def canPost(self):
         group = self.groupInfo.groupObj
-        retval = getMultiAdapter((group, self.loggedInUserInfo), 
+        retval = getMultiAdapter((group, self.userInfo), 
                     IGSPostingUser)
         return retval
 

@@ -13,6 +13,10 @@ class RuleViewlet(GroupViewlet):
     def show(self):
         m = 'Sub-classes must implement the "show" method.'
         raise NotImplementedError(m)
+    
+    @Lazy
+    def userInfo(self):
+        return self.manager.userInfo
 
 class BlockedRuleViewlet(RuleViewlet):
     weight = BlockedFromPosting.weight

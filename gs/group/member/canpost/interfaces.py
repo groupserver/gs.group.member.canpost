@@ -1,7 +1,7 @@
 # coding=utf-8
 from zope.contentprovider.interfaces import IContentProvider
 from zope.interface.interface import Interface
-from zope.schema import Bool, Choice, Int, Text, TextLine
+from zope.schema import Bool, Int, Text, Field
 from zope.viewlet.interfaces import IViewletManager
 
 class ICanPost(Interface):
@@ -49,4 +49,8 @@ class IGSUserCanPostContentProvider(IContentProvider):
 
 class ICanPostInfo(IViewletManager):
     u'''The viewlet manager for the Can Post information'''
+
+    passedInUserInfo = Field(title=u'Passed-In User Information',
+        description=u'User information for the person to be checked.',
+        required=False)
 

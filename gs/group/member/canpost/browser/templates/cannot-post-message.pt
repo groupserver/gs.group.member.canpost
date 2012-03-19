@@ -22,7 +22,8 @@
       Below is some information on the problem.
       Your original message is attached to this email.
     </p>
-    <p tal:replace="structure provider:groupserver.CanPost">
+    <p tal:define="passedInUserInfo userInfo"
+      tal:replace="structure provider:groupserver.CanPost">
       Woo
     </p>
     <!--Troubleshooting/return/warranty/damage information-->

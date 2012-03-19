@@ -5,7 +5,8 @@
   content="python:view.format_message(m)">stuff</tal:block>
 
 <tal:block
-  define="s provider:groupserver.CanPost;
+  define="passedInUserInfo userInfo;
+    s provider:groupserver.CanPost;
     m python:view.cp_to_txt(s);"
   content="structure python:view.format_message(m)">stuff</tal:block>
 
