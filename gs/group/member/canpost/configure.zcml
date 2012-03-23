@@ -41,6 +41,9 @@
     provides=".interfaces.ICanPostInfo"
     class=".viewletmanager.CanPostViewletManager"
     template="browser/templates/canpostinfo.pt"/>
+  <interface 
+    interface=".interfaces.ICanPostInfo"
+    type="zope.contentprovider.interfaces.ITALNamespaceData"/>
   <browser:viewlet name="gs-group-member-canpost-blocked-viewlet"
     manager=".interfaces.ICanPostInfo"
     template="browser/templates/blocked.pt"
