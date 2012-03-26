@@ -64,6 +64,20 @@
     template="browser/templates/cannot-post-message-txt.pt"
     permission="zope2.View"/>
 
+  <!--Unknown Email Notification-->
+  <browser:page
+    for="gs.group.base.interfaces.IGSGroupMarker"
+    name="unknown-email.html"
+    class=".unknownemail.UnknownEmailMessage"
+    template="browser/templates/unknown-email-message.pt"
+    permission="zope2.View"/>
+  <browser:page
+    for="gs.group.base.interfaces.IGSGroupMarker"
+    name="unknown-email.txt"
+    class=".unknownemail.UnknownEmailMessageText"
+    template="browser/templates/unknown-email-message-txt.pt"
+    permission="zope2.View"/>
+
   <!--Content Provider: OLD-->
   <interface 
     interface=".interfaces.IGSUserCanPostContentProvider"
