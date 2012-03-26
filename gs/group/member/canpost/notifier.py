@@ -65,7 +65,8 @@ class CannotPostMessage(GroupPage):
         m = 'I had a problem sending an email to %s on %s <%s>. '\
             'The issue was "%s (Reason Number %s)"' % \
             (gn, sn, self.groupInfo.url, cp.status, cp.statusNum)
-        retval = 'Hi!\n\n%s\n\nI need your help because...' % TextWrapper().fill(m)
+        retval = 'Hi!\n\n%s\n\nI need your help because...' % \
+            TextWrapper().fill(m)
         return retval
     
     def can_post_for_user(self, userInfo):
