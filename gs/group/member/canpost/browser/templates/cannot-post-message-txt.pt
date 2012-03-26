@@ -1,7 +1,7 @@
 <tal:block define="userInfo options/userInfo | view/loggedInUserInfo;">Dear <tal:block content="userInfo/name">Member</tal:block>,
 
 <tal:block 
-  define="m string:There was a problem posting a message to ${view/groupInfo/name}. Below is some information on the problem. Your original message is attached to this email."
+  define="m string:Your email message was not posted to ${view/groupInfo/name}. Below is some information on the problem. Your original message is attached to this email."
   content="python:view.format_message(m)">stuff</tal:block>
 
 <tal:block
