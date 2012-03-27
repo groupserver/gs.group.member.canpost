@@ -8,7 +8,7 @@ determining if a member can post.
 
 In this document I present how the `rules`_ for posting are created for
 each different type of group. I then discuss the `viewlets`_ and the
-`notification`_ that is sent to those that cannot post.
+`notifications`_ that is sent to those that cannot post.
 
 See the ``gs.group.type.discussion`` group for a real-life 
 implementation of some posting rules.
@@ -172,13 +172,20 @@ cannot post. The code for each viewlet is relatively simple:
 
 The viewlets appear in two places. First, they are shown at the bottom 
 of the Topic page if the person viewing the page cannot post. Second,
-they are shown in the `notification`_. 
+they are shown in the `notifications`_. 
 
-Notification
-============
+Notifications
+=============
+
+There are two notifications: the `cannot post`_ notification is sent to 
+people with a profile who cannot post, while `unknown email address`_
+is sent when the email address is not recognised.
+
+Cannot Post
+-----------
 
 The Cannot Post notification is sent out to people who post to the 
-group, but the can-post check blocks post. The notification contains the
+group, but the `rules`_ block the post. The notification contains the
 `viewlets`_ [#NotificationViewlets]_. As such care should be taken to
 ensure that each viewlet makes sense outside the context of the group,
 and all links in each viewlet are **absolute** links that include the
@@ -186,6 +193,71 @@ site name.
 
 The Cannot Post notification can be previewed by viewing the pages
 ``cannot-post.html`` and ``cannot-post.txt`` within each group.
+
+The notification is made up of five parts::
+
+    ┌──────────────────────────┐
+    │multipart/mixed           │
+    │┌────────────────────────┐│
+    ││ multipart/alternative  ││
+    ││┌──────────────────────┐││
+    │││┌────────────────────┐│││
+    ││││text/plain          ││││
+    │││└────────────────────┘│││
+    │││┌────────────────────┐│││
+    ││││text/html           ││││
+    │││└────────────────────┘│││
+    ││└──────────────────────┘││
+    │└────────────────────────┘│
+    │┌────────────────────────┐│
+    ││ message/rfc822         ││
+    │└────────────────────────┘│
+    └──────────────────────────┘
+
+* The text of the Cannot Post notification is contained within two
+  components:
+  
+  + ``text/plain`` contains the ``cannot-post.txt`` message, and
+  + ``text/html`` components contains the ``cannot-post.html``.
+
+* The two text block are wrapped in a ``multipart/alternative`` block. 
+
+* The message that could not be posted is placed in a ``message/rfc822`` 
+  block at the end of the email. 
+
+* Finally, everything is wrapped in a ``multipart/mixed`` block, which 
+  carries the subject line, addresses, and the rest of the headers.
+
+Unknown Email Address
+---------------------
+
+The unknown email address notification can be thought of as a highly
+specialised form of Cannot Post. It is sent when the mailing list 
+(``Products.XWFMailingListManager.XWFMailingList``) fails to recognise 
+the email address of the sender of a message. 
+
+The notification is constructed the same way as the `cannot post`_ 
+notification, with the same five parts. The text encourages the 
+recipient to add the email address to his or her profile: we speculate 
+that existing members posting from an unknown email address is the most
+common reason for receiving the notification. The rest of the  message 
+is similar to the "Not a Member" message that is sent by the standard 
+Cannot Post notification. The text can be previewed by looking at the
+``unknown-email.html`` and ``unknown-email.txt`` within each group.
+
+To send the message the unknown-email notifier (``unknownemail.Notifier``
+within this egg) acquires the ``Mail Host`` instance directly,
+assembles the email message, and sends the post. It avoids all use of
+the ``gs.profile.email.notify`` system.
+
+TODO
+~~~~
+The unknown email address notification should *probably* appear in the
+code that handles the mailing list. However, that product 
+(``Products.XWFMailingListManager``) is due for a **huge** refactor, so
+the unknown email address notification was placed here for safe-keeping.
+In the future this notification should be moved closer to the mailing 
+list.
 
 ..  [#userType] The user is almost always a 
     ``Products.CustomUserFolder.interfaces.IGSUserInfo`` instance.
