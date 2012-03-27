@@ -54,13 +54,13 @@
   <browser:page
     for="gs.group.base.interfaces.IGSGroupMarker"
     name="cannot-post.html"
-    class=".notifier.CannotPostMessage"
+    class=".notifications.CannotPostMessage"
     template="browser/templates/cannot-post-message.pt"
     permission="zope2.View"/>
   <browser:page
     for="gs.group.base.interfaces.IGSGroupMarker"
     name="cannot-post.txt"
-    class=".notifier.CannotPostMessageText"
+    class=".notifications.CannotPostMessageText"
     template="browser/templates/cannot-post-message-txt.pt"
     permission="zope2.View"/>
 
