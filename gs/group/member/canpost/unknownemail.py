@@ -73,23 +73,26 @@ class Notifier(object):
 
     def create_message(self, subject, txtMessage, htmlMessage, origMesg,
         fromAddress, toAddresses):
-        container = MIMEMultipart('alternative')
+        container = MIMEMultipart('mixed')
         container['Subject'] = str(Header(subject, UTF8))
         container['From'] = fromAddress
         container['To'] = toAddresses
 
+        messageTextContainer = MIMEMultipart('alternative')
+        container.attach(messageTextContainer)
+        
         txt = MIMEText(txtMessage.encode(UTF8), 'plain', UTF8)
-        container.attach(txt)
+        messageTextContainer.attach(txt)
         
         html = MIMEText(htmlMessage.encode(UTF8), 'html', UTF8)
-        container.attach(html)
+        messageTextContainer.attach(html)
         
         msg = message_from_string(origMesg)
         m = MIMEMessage(msg)
         m['Content-Description'] = 'Returned Message: %s' % \
             msg['Subject']
         m['Content-Disposition'] = 'inline'
-        m.set_param('name', 'Forwarded message')
+        m.set_param('name', 'Returned message')
         del m['MIME-Version']
         container.attach(m)
         
