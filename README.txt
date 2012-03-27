@@ -194,7 +194,11 @@ site name.
 The Cannot Post notification can be previewed by viewing the pages
 ``cannot-post.html`` and ``cannot-post.txt`` within each group.
 
-The notification is made up of five parts::
+The notification email is sent using a variant of the class
+``gs.profile.notify.sender.MessageSender``. The main difference is the
+notification is constructed differently, so it can include the original
+email message that was blocked. The notification email is made up of 
+five parts::
 
     ┌──────────────────────────┐
     │multipart/mixed           │
@@ -245,10 +249,11 @@ is similar to the "Not a Member" message that is sent by the standard
 Cannot Post notification. The text can be previewed by looking at the
 ``unknown-email.html`` and ``unknown-email.txt`` within each group.
 
-To send the message the unknown-email notifier (``unknownemail.Notifier``
-within this egg) acquires the ``Mail Host`` instance directly,
-assembles the email message, and sends the post. It avoids all use of
-the ``gs.profile.email.notify`` system.
+The unknown-email notifier (``unknownemail.Notifier`` within this egg) 
+avoids all use of the ``gs.profile.notify`` system — because there is
+not profile to sent the notification to! To send the notification the
+code acquires the ``Mail Host`` instance directly, assembles the email 
+message, and sends the post. 
 
 TODO
 ~~~~
