@@ -68,13 +68,13 @@
   <browser:page
     for="gs.group.base.interfaces.IGSGroupMarker"
     name="unknown-email.html"
-    class=".unknownemail.UnknownEmailMessage"
+    class=".notifications.UnknownEmailMessage"
     template="browser/templates/unknown-email-message.pt"
     permission="zope2.View"/>
   <browser:page
     for="gs.group.base.interfaces.IGSGroupMarker"
     name="unknown-email.txt"
-    class=".unknownemail.UnknownEmailMessageText"
+    class=".notifications.UnknownEmailMessageText"
     template="browser/templates/unknown-email-message-txt.pt"
     permission="zope2.View"/>
 

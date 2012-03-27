@@ -7,6 +7,7 @@ from zope.cachedescriptors.property import Lazy
 from Products.XWFMailingListManager.html2txt import convert_to_txt
 from Products.XWFCore.XWFUtils import get_support_email
 from gs.group.base.page import GroupPage
+from gs.group.privacy.interfaces import IGSGroupVisibility
 from interfaces import IGSPostingUser
         
 class CannotPostMessage(GroupPage):
@@ -54,5 +55,33 @@ class CannotPostMessageText(CannotPostMessage):
     def cp_to_txt(self, cp):
         t = convert_to_txt(cp)
         retval = self.spaceRE.sub(' ', t).strip()
+        return retval
+
+# Unknown Email Address      
+class UnknownEmailMessage(GroupPage):
+    def quote(self, msg):
+        assert msg
+        retval = quote(msg)
+        assert retval
+        return retval
+
+    @Lazy
+    def groupVisibility(self):
+        retval = IGSGroupVisibility(self.groupInfo)
+        assert retval
+        return retval
+
+class UnknownEmailMessageText(UnknownEmailMessage):
+    def __init__(self, context, request):
+        UnknownEmailMessage.__init__(self, context, request)
+        response = request.response
+        response.setHeader("Content-Type", 'text/plain; charset=UTF-8')
+        filename = 'unknown-email-%s.txt' % self.groupInfo.id
+        response.setHeader('Content-Disposition',
+                            'inline; filename="%s"' % filename)
+        self.textWrapper = TextWrapper()
+        
+    def format_message(self, m):
+        retval = self.textWrapper.fill(m)
         return retval
 
