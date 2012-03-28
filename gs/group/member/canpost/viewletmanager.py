@@ -14,8 +14,11 @@ class CanPostViewletManager(WeightOrderedViewletManager):
         
     @Lazy
     def userInfo(self):
-        retval = getattr(self, 'passedInUserInfo', self.loggedInUserInfo)
-        assert retval
+        # Sometimes we are passed None as the passedInUserInfo
+        piui = getattr(self, 'passedInUserInfo', None) 
+        retval = (piui and piui) or self.loggedInUserInfo
+        assert retval, 'userInfo is %s:\n  passedInUserInfo is %s\n  '\
+            'loggedInUser is %s' %(retval, piui, self.loggedInUserInfo) 
         return retval
         
     @Lazy
