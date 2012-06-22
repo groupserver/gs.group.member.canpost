@@ -32,6 +32,7 @@ setup(name='gs.group.member.canpost',
     zip_safe=True,
     install_requires=[
         'setuptools',
+        'gs.database',
         'gs.group.base',
         'Products.CustomUserFolder',
         'Products.XWFChat',
