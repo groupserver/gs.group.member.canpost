@@ -252,8 +252,7 @@ Cannot Post notification. The text can be previewed by looking at the
 The unknown-email notifier (``unknownemail.Notifier`` within this egg) 
 avoids all use of the ``gs.profile.notify`` system — because there is
 not profile to sent the notification to! To send the notification the
-code acquires the ``Mail Host`` instance directly, assembles the email 
-message, and sends the post. 
+code assembles the email message, and sends the post using ``gs.email.send_email``.
 
 TODO
 ~~~~

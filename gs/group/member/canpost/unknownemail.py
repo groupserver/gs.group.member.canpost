@@ -8,6 +8,7 @@ from email.MIMEMessage import MIMEMessage
 from email.utils import parseaddr
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject, getMultiAdapter
+from gs.email import send_email
 
 UTF8 = 'utf-8'
 
@@ -46,15 +47,6 @@ class Notifier(object):
         assert retval
         return retval
 
-    @Lazy
-    def mailhost(self):
-        sr = self.context.site_root()
-        try:
-            retval = sr.superValues('Mail Host')[0]
-        except:
-            raise AttributeError, "Can't find a Mail Host instance"
-        return retval
-
     def notify(self, toAddress, origMesg):
         s = u'%s: Problem Posting (Action Required)' % self.groupInfo.name
         email = parseaddr(toAddress)[1]
@@ -64,8 +56,7 @@ class Notifier(object):
         msg = self.create_message(s.encode(UTF8), text, html, origMesg,
                              fromAddress, toAddress)
         # TODO: Audit
-        self.mailhost._send(mfrom=fromAddress, mto=toAddress,
-                            messageText=msg)
+        send_email(fromAddress, toAddress, msg)
 
     def create_message(self, subject, txtMessage, htmlMessage, origMesg,
         fromAddress, toAddresses):
