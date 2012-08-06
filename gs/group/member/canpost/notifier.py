@@ -50,16 +50,19 @@ class Notifier(object):
         ms.send_message(subject, text, html, origMesg)
 
 class CannotPostMessageSender(MessageSender):
-    
     def send_message(self, subject, txtMessage, htmlMessage, origMesg):
-        msg = self.create_message(subject, txtMessage, htmlMessage, 
-                                    origMesg)
-        notifyUser = NotifyUser(self.toUserInfo.user)
         toAddresses = self.emailUser.get_delivery_addresses()
-        fromAddr = self.from_address(None)
-        for addr in toAddresses:
-            notifyUser.send_message(msg, addr, fromAddr)
-
+        if toAddresses:
+            msg = self.create_message(subject, txtMessage, htmlMessage, 
+                                      origMesg)
+            notifyUser = NotifyUser(self.toUserInfo.user)
+            fromAddr = self.from_address(None)
+            for addr in toAddresses:
+                notifyUser.send_message(msg, addr, fromAddr)
+        else:
+            log.warn("Cannot notify user %s, no delivery addresses" %
+                     self.toUserInfo.id)
+    
     def create_message(self, subject, txtMessage, htmlMessage, origMesg):
         container = MIMEMultipart('mixed')
         container['Subject'] = str(Header(subject, UTF8))
