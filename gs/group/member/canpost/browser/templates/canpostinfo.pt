@@ -1,10 +1,7 @@
-<div id="gs-group-member-canpost-info"
-  class="ui-state-highlight ui-corner-all"
-  style="padding:1.385em;"
-  tal:condition="not:view/canPost/canPost">
+<div id="gs-group-member-canpost-info" 
+     tal:condition="not:view/canPost/canPost">
   <tal:block repeat="viewlet options/viewlets">
     <tal:block
       content="structure viewlet/render">Content</tal:block>
   </tal:block>
 </div><!--gs-group-member-canpost-info-->
-
