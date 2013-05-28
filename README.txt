@@ -1,17 +1,31 @@
+===========================
+``gs.group.member.canpost``
+===========================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Determining if a group member can post
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:Author: `Michael JasonSmith`_
+:Contact: Michael JasonSmith <mpj17@onlinegroups.net>
+:Date: 2013-05-28
+:Organization: `GroupServer.org`_
+:Copyright: This document is licensed under a
+  `Creative Commons Attribution-Share Alike 3.0 New Zealand License`_
+  by `OnlineGroups.Net`_.
+
+
 Introduction
 ============
 
-This is the core code for determining if a group member can post. Both
-the mailing list code (``Products.XWFMailingListManager``) and the Topic
-interface (``gs.group.messages.topic``) rely on this code for 
-determining if a member can post.
+This is the core code for determining if a group member can post. The
+mailing list code [#list]_, the Topic interface [#topic]_ and Start a Topic
+[#start]_ rely on this code for determining if a member can post.
 
-In this document I present how the `rules`_ for posting are created for
-each different type of group. I then discuss the `viewlets`_ and the
-`notifications`_ that is sent to those that cannot post.
-
-See the ``gs.group.type.discussion`` group for a real-life 
-implementation of some posting rules.
+In this document I present how the rules_ for posting are created for each
+different type of group. I then discuss the viewlets_ and the
+notifications_ that is sent to those that cannot post.  See the discussion
+group [#discussion]_ for an example of an implementation of some posting
+rules.
 
 Rules
 =====
@@ -184,12 +198,11 @@ is sent when the email address is not recognised.
 Cannot Post
 -----------
 
-The Cannot Post notification is sent out to people who post to the 
-group, but the `rules`_ block the post. The notification contains the
-`viewlets`_ [#NotificationViewlets]_. As such care should be taken to
-ensure that each viewlet makes sense outside the context of the group,
-and all links in each viewlet are **absolute** links that include the
-site name.
+The Cannot Post notification is sent out to people who post to the group,
+but the rules_ block the post. The notification contains the viewlets_
+[#NotificationViewlets]_. As such care should be taken to ensure that each
+viewlet makes sense outside the context of the group, and all links in each
+viewlet are **absolute** links that include the site name.
 
 The Cannot Post notification can be previewed by viewing the pages
 ``cannot-post.html`` and ``cannot-post.txt`` within each group.
@@ -236,32 +249,52 @@ Unknown Email Address
 ---------------------
 
 The unknown email address notification can be thought of as a highly
-specialised form of Cannot Post. It is sent when the mailing list 
-(``Products.XWFMailingListManager.XWFMailingList``) fails to recognise 
-the email address of the sender of a message. 
+specialised form of Cannot Post. It is sent when the mailing list
+(``Products.XWFMailingListManager.XWFMailingList``) fails to recognise the
+email address of the sender of a message.
 
-The notification is constructed the same way as the `cannot post`_ 
-notification, with the same five parts. The text encourages the 
-recipient to add the email address to his or her profile: we speculate 
-that existing members posting from an unknown email address is the most
-common reason for receiving the notification. The rest of the  message 
-is similar to the "Not a Member" message that is sent by the standard 
-Cannot Post notification. The text can be previewed by looking at the
+The notification is constructed the same way as the `cannot post`_
+notification, with the same five parts. The text encourages the recipient
+to add the email address to his or her profile: we speculate that existing
+members posting from an unknown email address is the most common reason for
+receiving the notification. The rest of the message is similar to the "Not
+a Member" message that is sent by the standard Cannot Post
+notification. The text can be previewed by looking at the
 ``unknown-email.html`` and ``unknown-email.txt`` within each group.
 
-The unknown-email notifier (``unknownemail.Notifier`` within this egg) 
-avoids all use of the ``gs.profile.notify`` system — because there is
-not profile to sent the notification to! To send the notification the
-code assembles the email message, and sends the post using ``gs.email.send_email``.
+The unknown-email notifier (``unknownemail.Notifier`` within this egg)
+avoids all use of the ``gs.profile.notify`` system — because there is not
+profile to sent the notification to! To send the notification the code
+assembles the email message, and sends the post using
+``gs.email.send_email``.
 
 TODO
 ~~~~
-The unknown email address notification should *probably* appear in the
-code that handles the mailing list. However, that product 
-(``Products.XWFMailingListManager``) is due for a **huge** refactor, so
-the unknown email address notification was placed here for safe-keeping.
-In the future this notification should be moved closer to the mailing 
-list.
+
+The unknown email address notification should *probably* appear in the code
+that handles the mailing list. However, that product [#list]_ is due for a
+**huge** refactor, so the unknown email address notification was placed
+here for safe-keeping.  In the future this notification should be moved
+closer to the mailing list.
+
+Resources
+=========
+
+- Code repository: https://source.iopen.net/groupserver/gs.group.member.canpost
+- Questions and comments to http://groupserver.org/groups/development
+- Report bugs at https://redmine.iopen.net/projects/groupserver
+
+..  [#list] See
+            <https://source.iopen.net/groupserver/Products.XWFMailingListManager>
+
+..  [#topic] See
+             <https://source.iopen.net/groupserver/gs.group.messages.topic>
+
+..  [#start] See
+             <https://source.iopen.net/groupserver/gs.group.messages.starttopic/>
+
+..  [#discussion] See
+                  <https://source.iopen.net/groupserver/gs.group.type.discussion>
 
 ..  [#userType] The user is almost always a 
     ``Products.CustomUserFolder.interfaces.IGSUserInfo`` instance.
@@ -293,3 +326,9 @@ list.
     viewlet in two forms: the normal HTML version, and a plain-text
     version, which the notification generates from the HTML.
 
+.. _GroupServer: http://groupserver.org/
+.. _GroupServer.org: http://groupserver.org/
+.. _OnlineGroups.Net: https://onlinegroups.net
+.. _Michael JasonSmith: http://groupserver.org/p/mpj17
+.. _Creative Commons Attribution-Share Alike 3.0 New Zealand License:
+   http://creativecommons.org/licenses/by-sa/3.0/nz/
