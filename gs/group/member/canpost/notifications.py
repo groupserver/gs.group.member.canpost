@@ -12,7 +12,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from __future__ import absolute_url
+from __future__ import absolute_import
 import re
 from urllib import quote
 from textwrap import TextWrapper
@@ -20,12 +20,13 @@ from zope.component import getMultiAdapter
 from zope.cachedescriptors.property import Lazy
 from Products.XWFMailingListManager.html2txt import convert_to_txt
 from Products.XWFCore.XWFUtils import get_support_email
-from gs.group.base.page import GroupPage
+from gs.content.email.base import GroupEmail
 from gs.group.privacy.interfaces import IGSGroupVisibility
 from .interfaces import IGSPostingUser
 
 
-class CannotPostMessage(GroupPage):
+class CannotPostMessage(GroupEmail):
+
     def supportAddress(self, userInfo):
         gn = self.groupInfo.name.encode('ascii', 'ignore')
         s = 'Subject=%s' % quote('Cannot Post to %s' % gn)
@@ -76,7 +77,8 @@ class CannotPostMessageText(CannotPostMessage):
 
 
 # Unknown Email Address
-class UnknownEmailMessage(GroupPage):
+class UnknownEmailMessage(GroupEmail):
+
     def quote(self, msg):
         assert msg
         retval = quote(msg)

@@ -1,4 +1,7 @@
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="context/@@groupserver_email_layout/page">
   <head>
     <title metal:fill-slot="title">Cannot Post:
     <tal:block content="view/groupInfo/name">This group</tal:block>:
@@ -7,7 +10,7 @@
   </head>
   <body>
     <div metal:fill-slot="body" id="gs-group-member-canpost-unknown-email"
-         tal:define="email options/email | string:example@email.address;">
+         tal:define="email options/email | string:example@example.com;">
       <h2>Problem Posting to <span tal:content="view/groupInfo/name">This Group</span></h2>
       <p>
         Hi there,
@@ -15,12 +18,9 @@
       <p>
         Your email message to
         <span tal:content="view/groupInfo/name">This Group</span>
-        was rejected, because the site
-        <a href="#"
-           tal:attributes="href view/siteInfo/url" 
-           tal:content="view/siteInfo/name">Site</a>
-        did not recognise your email address:
-        <code tal:content="email">this@email.address</code>.
+        was rejected because your email address,
+        <code tal:content="email">this@email.address</code>,
+        was not recognised.
       </p>
       <div id="gs-group-member-canpost-unknown-email-all">
         <p>
@@ -40,8 +40,7 @@
             <code tal:content="email">this@email.address</code></li>
         </ol>
       </div><!--gs-group-member-canpost-unknown-email-all-->
-      <p>
-        id="gs-group-member-canpost-unknown-email-public" 
+      <p id="gs-group-member-canpost-unknown-email-public" 
         tal:condition="view/groupVisibility/isPublic">
         If you are <strong>new</strong> to 
         <span
@@ -54,7 +53,7 @@
         If you are <strong>new</strong> to 
         <span tal:content="view/groupInfo/name">This Group</span> then
         you can
-        <a tal:define="href string:${view/groupInfo/url}/request.html"
+        <a tal:attributes="href string:${view/groupInfo/url}/request.html"
            href="#"><strong>request</strong> membership</a> of the group.
       </p><!--gs-group-member-canpost-unknown-email-private-->
       <p id="gs-group-member-canpost-unknown-email-secret" 
@@ -78,13 +77,12 @@
         <a tal:define="sa view/siteInfo/get_support_email;
                        m string:Hi,
                        
-                       I received an 'Unknown Email Address' message when I tried to post from
-                       ${email} to '${view/groupInfo/name}' 
-                       ${view/groupInfo/url}
+I received an 'Unknown Email Address' message when I tried to post from
+${email} to '${view/groupInfo/name}' ${view/groupInfo/url}
 
 I need your help because...;
 msg python:view.quote(m);"
-           tal:attributes="href string:mailto:${sa}?Subject=Unknown%20Email%20Address&body=${msg}"
+           tal:attributes="href string:mailto:${sa}?Subject=Unknown%20email%20address&amp;body=${msg}"
            href="#"><code tal:content="sa">this address</code></a>
       </p>
       <!--Website address-->
