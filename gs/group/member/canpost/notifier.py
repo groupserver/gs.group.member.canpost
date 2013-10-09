@@ -1,24 +1,35 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+# Copyright © 2013 OnlineGroups.net and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
 from email import message_from_string
-from email.Message import Message
 from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEMessage import MIMEMessage
-from email.utils import parseaddr
 from zope.component import createObject, getMultiAdapter
 from zope.cachedescriptors.property import Lazy
 from gs.profile.notify.sender import MessageSender
 from gs.profile.notify.notifyuser import NotifyUser
 import logging
 log = logging.getLogger('gs.group.member.canpost.notifier')
-
 UTF8 = 'utf-8'
+
 
 class Notifier(object):
     textTemplateName = 'cannot-post.txt'
     htmlTemplateName = 'cannot-post.html'
-    
+
     def __init__(self, context, request):
         self.group = self.context = context
         self.request = request
@@ -31,32 +42,33 @@ class Notifier(object):
 
     @Lazy
     def textTemplate(self):
-        retval = getMultiAdapter((self.context, self.request), 
+        retval = getMultiAdapter((self.context, self.request),
                     name=self.textTemplateName)
         assert retval
         return retval
 
     @Lazy
     def htmlTemplate(self):
-        retval = getMultiAdapter((self.context, self.request), 
+        retval = getMultiAdapter((self.context, self.request),
                     name=self.htmlTemplateName)
         assert retval
         return retval
-        
+
     def notify(self, userInfo, siteInfo, groupInfo, origMesg):
         subject = (u'%s: Problem Posting' % groupInfo.name).encode(UTF8)
-        text = self.textTemplate(userInfo=userInfo, siteInfo=siteInfo, 
+        text = self.textTemplate(userInfo=userInfo, siteInfo=siteInfo,
                     groupInfo=groupInfo)
-        html = self.htmlTemplate(userInfo=userInfo, siteInfo=siteInfo, 
+        html = self.htmlTemplate(userInfo=userInfo, siteInfo=siteInfo,
                     groupInfo=groupInfo)
         ms = CannotPostMessageSender(self.context, userInfo)
         ms.send_message(subject, text, html, origMesg)
+
 
 class CannotPostMessageSender(MessageSender):
     def send_message(self, subject, txtMessage, htmlMessage, origMesg):
         toAddresses = self.emailUser.get_delivery_addresses()
         if toAddresses:
-            msg = self.create_message(subject, txtMessage, htmlMessage, 
+            msg = self.create_message(subject, txtMessage, htmlMessage,
                                       origMesg)
             notifyUser = NotifyUser(self.toUserInfo.user)
             fromAddr = self.from_address(None)
@@ -65,7 +77,7 @@ class CannotPostMessageSender(MessageSender):
         else:
             log.warn("Cannot notify user %s, no delivery addresses" %
                      self.toUserInfo.id)
-    
+
     def create_message(self, subject, txtMessage, htmlMessage, origMesg):
         container = MIMEMultipart('mixed')
         container['Subject'] = str(Header(subject, UTF8))
@@ -76,13 +88,13 @@ class CannotPostMessageSender(MessageSender):
 
         messageTextContainer = MIMEMultipart('alternative')
         container.attach(messageTextContainer)
-        
+
         txt = MIMEText(txtMessage.encode(UTF8), 'plain', UTF8)
         messageTextContainer.attach(txt)
-        
+
         html = MIMEText(htmlMessage.encode(UTF8), 'html', UTF8)
         messageTextContainer.attach(html)
-        
+
         msg = message_from_string(origMesg)
         m = MIMEMessage(msg)
         m['Content-Description'] = 'Returned Message: %s' % \
@@ -91,8 +103,7 @@ class CannotPostMessageSender(MessageSender):
         m.set_param('name', 'Returned message')
         del m['MIME-Version']
         container.attach(m)
-        
+
         retval = container.as_string()
         assert retval
         return retval
-

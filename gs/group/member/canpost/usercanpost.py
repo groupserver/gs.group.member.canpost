@@ -1,4 +1,17 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+# Copyright © 2013 OnlineGroups.net and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
 import pytz
 from datetime import datetime, timedelta
 from zope.cachedescriptors.property import Lazy
@@ -14,9 +27,9 @@ from Products.GSProfile import interfaces as profileinterfaces
 from gs.profile.email.base.emailuser import EmailUser
 from gs.group.member.base.utils import user_member_of_group, \
     user_admin_of_group, user_participation_coach_of_group
-
 import logging
 log = logging.getLogger('gs.group.member.canpost.usercanpost')
+
 
 class GSGroupMemberPostingInfo(object):
     def __init__(self, group, userInfo):
@@ -24,11 +37,11 @@ class GSGroupMemberPostingInfo(object):
           u'%s is not a group folder' % group
         assert IGSUserInfo.providedBy(userInfo),\
           u'%s is not a user-info' % userInfo
-        
+
         self.site_root = group.site_root()
         self.userInfo = userInfo
         self.groupInfo = IGSGroupInfo(group)
-        
+
         self.__status = None
         self.__statusNum = 0
         self.__canPost = None
@@ -39,16 +52,16 @@ class GSGroupMemberPostingInfo(object):
         mailingListManager = self.site_root.ListManager
         retval = mailingListManager.get_list(self.groupInfo.id)
         return retval
-        
+
     @Lazy
     def messageQuery(self):
         retval = MessageQuery(self.groupInfo.groupObj)
         return retval
-    
+
     @Lazy
     def status(self):
         # call self.canPost so that __status gets set as a side-effect.
-        _justCall = self.canPost
+        _justCall = self.canPost  # lint:ok
         retval = self.__status
         assert retval
         assert type(retval) == unicode
@@ -63,27 +76,27 @@ class GSGroupMemberPostingInfo(object):
     @Lazy
     def canPost(self):
         retval = \
-          not(self.user_blocked_from_posting()) and\
-              (self.group_is_unclosed() or\
-                  ((not(self.user_anonymous()) and\
-                      self.user_is_member() and\
-                      self.user_has_preferred_email_addresses() and\
-                      self.user_is_posting_member() and\
-                      not(self.user_posting_limit_hit()) and\
+          not(self.user_blocked_from_posting()) and \
+              (self.group_is_unclosed() or
+                  ((not(self.user_anonymous()) and
+                      self.user_is_member() and
+                      self.user_has_preferred_email_addresses() and
+                      self.user_is_posting_member() and
+                      not(self.user_posting_limit_hit()) and
                       self.user_has_required_properties())))
         assert type(retval) == bool
         return retval
-        
+
     def group_is_unclosed(self):
-        '''A closed group is one where only members can post. It is 
+        '''A closed group is one where only members can post. It is
           defined by the Germanic-property "unclosed", which GroupServer
           inherited from MailBoxer. (We would love to change its name, but
           it would break too much code.)
-          
-          If the "unclosed" property is "True" then the group is open to 
+
+          If the "unclosed" property is "True" then the group is open to
           any poster, and we do not have to bother with any member-specific
           checks. Support groups like this.
-          
+
           If the "unclosed" property is "False" then we have to perform the
           member-specific checks to ensure that the posting user is allowed
           to post.
@@ -110,14 +123,14 @@ class GSGroupMemberPostingInfo(object):
         else:
             self.__status = u'logged in'
             self.__statusNum = 0
-            
+
         assert type(self.__status) == unicode
         assert type(retval) == bool
         return retval
 
     def user_has_preferred_email_addresses(self):
-        '''Does the user have at least one preferred (alias default 
-        delivery) email address to post. This is mostly a safety 
+        '''Does the user have at least one preferred (alias default
+        delivery) email address to post. This is mostly a safety
         catch to ensure that the user has verified the email addresses.
         '''
         emailUser = EmailUser(self.groupInfo.groupObj, self.userInfo)
@@ -168,8 +181,8 @@ class GSGroupMemberPostingInfo(object):
         return retval
 
     def user_posting_limit_hit(self):
-        '''The posting limits are based on the *rate* of posting to the 
-        group. The maximum allowed rate of posting is defined by the 
+        '''The posting limits are based on the *rate* of posting to the
+        group. The maximum allowed rate of posting is defined by the
         "senderlimit" and "senderinterval" properties of the mailing list
         for the group. If the user has exceeded his or her posting limits
         if  more than "senderlimit" posts have been sent in
@@ -194,16 +207,16 @@ class GSGroupMemberPostingInfo(object):
             td = timedelta(seconds=interval)
             now = datetime.now(pytz.utc)
             earlyDate = now - td
-            count = self.messageQuery.num_posts_after_date(sid, gid, uid, 
+            count = self.messageQuery.num_posts_after_date(sid, gid, uid,
                                                            earlyDate)
             if count >= limit:
                 # The user has made over the allowed number of posts in
                 # the interval
                 retval = True
                 d = self.old_message_post_date()
-                
+
                 canPostDate = d + td
-                prettyDate = munge_date(self.groupInfo.groupObj, 
+                prettyDate = munge_date(self.groupInfo.groupObj,
                     canPostDate, user=self.userInfo.user)
                 prettyDelta = timedelta_to_string(canPostDate - now)
                 self.__status = u'post again at %s\n-- in %s' %\
@@ -226,15 +239,15 @@ class GSGroupMemberPostingInfo(object):
         if offset < 0:
             offset = 0
             log.warning("senderlimit of %s was set to 0 or less" % gid)
-            
+
         tokens = createObject('groupserver.SearchTextTokens', '')
-        posts = self.messageQuery.post_search_keyword(tokens, sid, [gid], 
+        posts = self.messageQuery.post_search_keyword(tokens, sid, [gid],
           [uid], 1, offset)
-        
+
         assert len(posts) == 1
         retval = posts[0]['date']
         assert isinstance(retval, datetime)
-        
+
         return retval
 
     def user_blocked_from_posting(self):
@@ -242,7 +255,7 @@ class GSGroupMemberPostingInfo(object):
         tool. Rather than removing a disruptive member from the group, or
         moderating the user, the user can be blocked from posting.
         '''
-        blockedMemberIds = self.mailingList.getProperty('blocked_members', 
+        blockedMemberIds = self.mailingList.getProperty('blocked_members',
                                                         [])
         if (self.userInfo.id in blockedMemberIds):
             retval = True
@@ -261,18 +274,18 @@ class GSGroupMemberPostingInfo(object):
         he or she can post to the group — otherwise they would not be
         required, would they! The required properties can come from one
         of two places: the properties that are required for the site, and
-        the properties required for the group. 
+        the properties required for the group.
         '''
         requiredSiteProperties = self.get_required_site_properties()
         requiredGroupProperties = self.get_required_group_properties()
         requiredProperties = requiredSiteProperties + requiredGroupProperties
-        
+
         unsetRequiredProps = [p for p in requiredProperties
                               if not(self.userInfo.get_property(p, None))]
         if unsetRequiredProps:
             retval = False
             self.__status = u'required properties set'
-            fields = [a.title for n, a in self.get_site_properties() 
+            fields = [a.title for n, a in self.get_site_properties()
                       if n in unsetRequiredProps]
             f = comma_comma_and(fields)
             attr = (len(fields) == 1 and u'attribute') or u'attributes'
@@ -293,7 +306,7 @@ class GSGroupMemberPostingInfo(object):
         are defined in the file-system, but which schema to use is stored
         in the "GlobalConfiguration" instance.
         '''
-        if self.__profileInterfaces == None:
+        if self.__profileInterfaces is None:
             assert hasattr(self.site_root, 'GlobalConfiguration')
             config = self.site_root.GlobalConfiguration
             ifName = config.getProperty('profileInterface',
@@ -317,9 +330,9 @@ class GSGroupMemberPostingInfo(object):
         retval = [n for n, a in self.get_site_properties() if a.required]
         assert type(retval) == list
         return retval
-        
+
     def get_required_group_properties(self):
-        '''Required group properties are stored on the mailing-list 
+        '''Required group properties are stored on the mailing-list
         instance for the group. They are checked against the site-wide
         user properties, to ensure that it is *possible* to have the
         user-profile attribute filled.
@@ -332,4 +345,3 @@ class GSGroupMemberPostingInfo(object):
                 retval.append(prop)
         assert type(retval) == list
         return retval
-

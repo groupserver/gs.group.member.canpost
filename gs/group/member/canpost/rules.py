@@ -1,17 +1,32 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+# Copyright © 2013 OnlineGroups.net and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject
 from Products.GSGroup.interfaces import IGSGroupInfo
 
+
 class BaseRule(object):
     weight = None
+
     def __init__(self, userInfo, group):
         self.userInfo = userInfo
         self.group = group
-        self.s =  { 'checked':    False,
-                    'canPost':    False,
-                    'status':     u'not implemented', 
-                    'statusNum':  -1,}
+        self.s = {'checked': False,
+                    'canPost': False,
+                    'status': u'not implemented',
+                    'statusNum': -1, }
 
     @Lazy
     def groupInfo(self):
@@ -21,7 +36,7 @@ class BaseRule(object):
     def siteInfo(self):
         retval = createObject('groupserver.SiteInfo', self.group)
         return retval
-            
+
     @Lazy
     def mailingList(self):
         site_root = self.group.site_root()
@@ -32,14 +47,14 @@ class BaseRule(object):
     def check(self):
         m = 'Sub-classes must implement the check method.'
         raise NotImplementedError(m)
-        
+
     @Lazy
     def canPost(self):
         self.check()
         retval = self.s['canPost']
         assert type(retval) == bool
         return retval
-    
+
     @Lazy
     def status(self):
         self.check()
@@ -60,11 +75,12 @@ class BaseRule(object):
                 (retval, self.canPost)
         return retval
 
+
 class BlockedFromPosting(BaseRule):
-    u'''A person will be prevented from posting if he or she is 
+    u'''A person will be prevented from posting if he or she is
     explicitly blocked by an administrator of the group.'''
     weight = 10
-            
+
     def check(self):
         if not self.s['checked']:
             ml = self.mailingList
@@ -83,4 +99,3 @@ class BlockedFromPosting(BaseRule):
         assert type(self.s['canPost']) == bool
         assert type(self.s['status']) == unicode
         assert type(self.s['statusNum']) == int
-
