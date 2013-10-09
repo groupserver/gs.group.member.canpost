@@ -3,7 +3,7 @@
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       metal:use-macro="context/@@groupserver_email_layout/page">
   <head>
-    <title metal:fill-slot="title">Cannot Post:
+    <title metal:fill-slot="title">Unknown email:
     <tal:block content="view/groupInfo/name">This group</tal:block>:
     <tal:block content="view/siteInfo/name">This site</tal:block>:
     </title>    
@@ -11,7 +11,7 @@
   <body>
     <div metal:fill-slot="body" id="gs-group-member-canpost-unknown-email"
          tal:define="email options/email | string:example@example.com;">
-      <h2>Problem Posting to <span tal:content="view/groupInfo/name">This Group</span></h2>
+      <h2>Problem posting to <span tal:content="view/groupInfo/name">This Group</span></h2>
       <p>
         Hi there,
       </p>

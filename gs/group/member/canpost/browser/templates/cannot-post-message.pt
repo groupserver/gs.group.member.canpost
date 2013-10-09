@@ -1,54 +1,44 @@
-<html tal:define="userInfo options/userInfo | view/loggedInUserInfo;">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      metal:use-macro="context/@@groupserver_email_layout/page">
   <head>
-    <title>Cannot Post:
+    <title metal:fill-slot="title">Cannot Post:
       <tal:block content="view/groupInfo/name">Group</tal:block>:
       <tal:block content="view/siteInfo/name">Group</tal:block>:
     </title>    
   </head>
-  <body style="font:13px Trebuchet,'Trebuchet MS',arial,helvetica,clean,sans-serif;line-height:1.385;color:black;background:white;">
-    <h1 style="width:100%;border-bottom:thick solid black;margin-bottom:0.692em;"><a href="#"
-      style="color:black;text-decoration:none;"
-      tal:attributes="href view/siteInfo/url" 
-      tal:content="view/siteInfo/name">Site</a></h1>
-    <h2 style="font-size:207.7%;margin:0 0 1em 0;">Problem Posting to
+  <body>
+    <div metal:fill-slot="body" id="gs-group-member-canpost-cannot" 
+         tal:define="userInfo options/userInfo | view/loggedInUserInfo;">
+      <h2>Problem posting to
       <span tal:content="view/groupInfo/name">This Group</span></h2>
-    <p style="margin: 1.385em 0 1.385em 0;">
-      Dear
-      <span tal:content="userInfo/name">Member</span>,
-    </p>
-    <p style="margin: 1.385em 0 1.385em 0;">
-      Your email message was not posted to
-      <span tal:content="view/groupInfo/name">This Group</span>.
-      Below is some information on the problem.
-      Your original message is attached to this email.
-    </p>
-    <p tal:define="passedInUserInfo userInfo"
-      tal:replace="structure provider:groupserver.CanPost">
-      Woo
-    </p>
-    <!--Troubleshooting/return/warranty/damage information-->
-    <p style="margin: 1.385em 0 1.385em 0;">
-      If you have any problems, email us at 
-      <a tal:attributes="href python:view.supportAddress(userInfo)"
-        href="#"><code tal:content="view/siteInfo/get_support_email">this address</code></a>
-    </p>
-    <!--Website address-->
-    <p style="margin: 1.385em 0 1.385em 0;">
-      Kind regards<br/>
-      <span style="padding:0 0 0 1.385em;">The 
-        <span tal:content="view/siteInfo/name">Site</span> 
-      Team</span>
-    </p>
-    <hr/>
-    <!--Terms and conditions-->
-    <p style="margin: 1.385em 0 1.385em 0;">
-      <a tal:attributes="href string:${view/siteInfo/url}/policies/privacy"
-        href="#">Privacy</a> | 
-      <a tal:attributes="href string:${view/siteInfo/url}/policies/aup"
-        href="#">Acceptable Use</a> | 
-      <a tal:attributes="href string:${view/siteInfo/url}/policies/tos"
-        href="#">Terms of Service</a>
-    </p>
+      <p>
+        Dear
+        <span tal:content="userInfo/name">Member</span>,
+      </p>
+      <p>
+        Your email message was not posted to
+        <span tal:content="view/groupInfo/name">This Group</span>.
+        Below is some information on the problem.
+        Your original message is attached to this email.
+      </p>
+      <p tal:define="passedInUserInfo userInfo"
+         tal:replace="structure provider:groupserver.CanPost">
+        Woo
+      </p>
+      <!--Troubleshooting/return/warranty/damage information-->
+      <p>
+        If you have any problems, email us at 
+        <a tal:attributes="href python:view.supportAddress(userInfo)"
+           href="#"><code tal:content="view/siteInfo/get_support_email">this address</code></a>
+      </p>
+      <!--Website address-->
+      <p class="closing">
+        Kind regards<br/>
+        <span>The <span tal:content="view/siteInfo/name">Site</span>  Team</span>
+      </p>
+    </div>
   </body>
 </html>
 
