@@ -12,7 +12,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from __future__ import absolute_path
+from __future__ import absolute_import
 from zope.cachedescriptors.property import Lazy
 from zope.component import getMultiAdapter
 from gs.group.base.page import GroupPage

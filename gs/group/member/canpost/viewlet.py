@@ -14,7 +14,7 @@
 ##############################################################################
 from __future__ import absolute_import
 from zope.cachedescriptors.property import Lazy
-from gs.group.base.viewlet import GroupViewlet
+from gs.group.base import GroupViewlet
 from .rules import BlockedFromPosting
 
 
