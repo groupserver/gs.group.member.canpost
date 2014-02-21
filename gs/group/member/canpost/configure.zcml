@@ -1,27 +1,40 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!-- Copyright © 2013 OnlineGroups.net and Contributors. -->
+<!-- All Rights Reserved. -->
+
+<!-- This software is subject to the provisions of the Zope Public -->
+<!-- License, Version 2.1 (ZPL).  A copy of the ZPL should accompany this -->
+<!-- distribution. -->
+
+<!-- THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED -->
+<!-- WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED -->
+<!-- WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND -->
+<!-- FITNESS FOR A PARTICULAR PURPOSE. -->
 <configure xmlns="http://namespaces.zope.org/zope"
-  xmlns:browser="http://namespaces.zope.org/browser"
-  xmlns:five="http://namespaces.zope.org/five">
-  
+           xmlns:browser="http://namespaces.zope.org/browser"
+           i18n_domain="groupserver">
+
+  <include package="zope.viewlet" file="meta.zcml" />
+
   <!--Posting User Adaptor--><!--=mpj17= New-->
   <adapter
     for="gs.group.base.interfaces.IGSGroupMarker
-          Products.CustomUserFolder.interfaces.IGSUserInfo"
-    provides=".interfaces.IGSPostingUser" 
+         Products.CustomUserFolder.interfaces.IGSUserInfo"
+    provides=".interfaces.IGSPostingUser"
     factory=".canpost.CanPostToGroup" />
   <adapter
-    for="Products.XWFChat.interfaces.IGSGroupFolder 
+    for="Products.XWFChat.interfaces.IGSGroupFolder
          Products.CustomUserFolder.interfaces.IGSUserInfo"
-    provides=".interfaces.IGSPostingUser" 
+    provides=".interfaces.IGSPostingUser"
     factory=".canpost.CanPostToGroup" />
 
-  <!-- The basic "Blocked from Posting" rule. Note: The name is 
-    -   important, so that a *named* adaptor is created. -->
+  <!-- The basic "Blocked from Posting" rule. Note: The name is
+       -   important, so that a *named* adaptor is created. -->
   <adapter
     name="Blocked from Posting"
-    for="Products.CustomUserFolder.interfaces.IGSUserInfo 
-      gs.group.base.interfaces.IGSGroupMarker"
-    provides=".interfaces.IGSCanPostRule" 
+    for="Products.CustomUserFolder.interfaces.IGSUserInfo
+         gs.group.base.interfaces.IGSGroupMarker"
+    provides=".interfaces.IGSCanPostRule"
     factory=".rules.BlockedFromPosting"  />
 
   <!--The list of posting rules in the group.-->
@@ -39,10 +52,11 @@
     provides=".interfaces.ICanPostInfo"
     class=".viewletmanager.CanPostViewletManager"
     template="browser/templates/canpostinfo.pt"/>
-  <interface 
+  <interface
     interface=".interfaces.ICanPostInfo"
     type="zope.contentprovider.interfaces.ITALNamespaceData"/>
-  <browser:viewlet name="gs-group-member-canpost-blocked-viewlet"
+  <browser:viewlet
+    name="gs-group-member-canpost-blocked-viewlet"
     manager=".interfaces.ICanPostInfo"
     template="browser/templates/blocked.pt"
     class=".viewlet.BlockedRuleViewlet"
@@ -50,46 +64,45 @@
 
   <!--Notifications-->
   <browser:page
-    for="gs.group.base.interfaces.IGSGroupMarker"
     name="cannot-post.html"
+    for="gs.group.base.interfaces.IGSGroupMarker"
     class=".notifications.CannotPostMessage"
     template="browser/templates/cannot-post-message.pt"
     permission="zope2.View"/>
   <browser:page
-    for="gs.group.base.interfaces.IGSGroupMarker"
     name="cannot-post.txt"
+    for="gs.group.base.interfaces.IGSGroupMarker"
     class=".notifications.CannotPostMessageText"
     template="browser/templates/cannot-post-message-txt.pt"
     permission="zope2.View"/>
 
   <!--Unknown Email Notification-->
   <browser:page
-    for="gs.group.base.interfaces.IGSGroupMarker"
     name="unknown-email.html"
+    for="gs.group.base.interfaces.IGSGroupMarker"
     class=".notifications.UnknownEmailMessage"
     template="browser/templates/unknown-email-message.pt"
     permission="zope2.View"/>
   <browser:page
-    for="gs.group.base.interfaces.IGSGroupMarker"
     name="unknown-email.txt"
+    for="gs.group.base.interfaces.IGSGroupMarker"
     class=".notifications.UnknownEmailMessageText"
     template="browser/templates/unknown-email-message-txt.pt"
     permission="zope2.View"/>
 
   <!--Content Provider: OLD-->
-  <interface 
+  <interface
     interface=".interfaces.IGSUserCanPostContentProvider"
     type="zope.contentprovider.interfaces.ITALNamespaceData"/>
   <class class=".usercanpostcontentprovider.GSUserCanPostContentProvider">
     <implements interface=".interfaces.IGSUserCanPostContentProvider"/>
   </class>
   <adapter
-    for="zope.interface.Interface 
-        zope.publisher.interfaces.browser.IDefaultBrowserLayer 
-        zope.interface.Interface"
+    for="zope.interface.Interface
+         zope.publisher.interfaces.browser.IDefaultBrowserLayer
+         zope.interface.Interface"
     factory=".usercanpostcontentprovider.GSUserCanPostContentProvider"
     provides="zope.contentprovider.interfaces.IContentProvider"
     name="groupserver.UserCanPost"/>
 
 </configure>
-
