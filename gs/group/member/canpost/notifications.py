@@ -12,7 +12,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 import re
 from urllib import quote
 from textwrap import TextWrapper
@@ -20,7 +20,8 @@ from zope.component import getMultiAdapter
 from zope.cachedescriptors.property import Lazy
 from Products.XWFMailingListManager.html2txt import convert_to_txt
 from Products.XWFCore.XWFUtils import get_support_email
-from gs.content.email.base import GroupEmail
+from gs.core import to_ascii
+from gs.content.email.base import GroupEmail, TextMixin
 from gs.group.privacy.interfaces import IGSGroupVisibility
 from .interfaces import IGSPostingUser
 
@@ -28,7 +29,7 @@ from .interfaces import IGSPostingUser
 class CannotPostMessage(GroupEmail):
 
     def supportAddress(self, userInfo):
-        gn = self.groupInfo.name.encode('ascii', 'ignore')
+        gn = to_ascii(self.groupInfo.name)
         s = 'Subject=%s' % quote('Cannot Post to %s' % gn)
         b = 'body=%s' % quote(self.message_body(userInfo))
         e = get_support_email(self.context, self.siteInfo.id)
@@ -36,8 +37,8 @@ class CannotPostMessage(GroupEmail):
         return retval
 
     def message_body(self, userInfo):
-        gn = self.groupInfo.name.encode('ascii', 'ignore')
-        sn = self.siteInfo.name.encode('ascii', 'ignore')
+        gn = to_ascii(self.groupInfo.name)
+        sn = to_ascii(self.siteInfo.name)
         cp = self.can_post_for_user(userInfo)
         m = 'I had a problem sending an email to %s on %s <%s>. '\
             'The issue was "%s (Reason Number %s)"' % \
@@ -53,22 +54,14 @@ class CannotPostMessage(GroupEmail):
         return retval
 
 
-class CannotPostMessageText(CannotPostMessage):
+class CannotPostMessageText(CannotPostMessage, TextMixin):
     spaceRE = re.compile(r'\s+')
 
     def __init__(self, context, request):
         CannotPostMessage.__init__(self, context, request)
-        response = request.response
-        response.setHeader("Content-Type", 'text/plain; charset=UTF-8')
         filename = 'cannot-post-%s-to-%s.txt' % \
             (self.loggedInUserInfo.id, self.groupInfo.id)
-        response.setHeader('Content-Disposition',
-                            'inline; filename="%s"' % filename)
-        self.textWrapper = TextWrapper()
-
-    def format_message(self, m):
-        retval = self.textWrapper.fill(m)
-        return retval
+        self.set_header(filename)
 
     def cp_to_txt(self, cp):
         t = convert_to_txt(cp)
@@ -92,16 +85,12 @@ class UnknownEmailMessage(GroupEmail):
         return retval
 
 
-class UnknownEmailMessageText(UnknownEmailMessage):
+class UnknownEmailMessageText(UnknownEmailMessage, TextMixin):
     def __init__(self, context, request):
-        UnknownEmailMessage.__init__(self, context, request)
-        response = request.response
-        response.setHeader("Content-Type", 'text/plain; charset=UTF-8')
+        super(UnknownEmailMessageText, self).__init__(context, request)
         filename = 'unknown-email-%s.txt' % self.groupInfo.id
-        response.setHeader('Content-Disposition',
-                            'inline; filename="%s"' % filename)
-        self.textWrapper = TextWrapper()
+        self.set_header(filename)
 
     def format_message(self, m):
-        retval = self.textWrapper.fill(m)
+        retval = self.fill(m)
         return retval

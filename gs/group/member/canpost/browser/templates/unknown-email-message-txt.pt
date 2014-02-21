@@ -1,13 +1,13 @@
-<tal:block define="email options/email | string:example@email.address;">
+<tal:block define="email options/email | string:email.address@example.com;">
 Hi there,
 
-<tal:block 
+<tal:block
   define="m string:Your email message to ${view/groupInfo/name} was rejected, because the site ${view/siteInfo/name} did not recognise your email address: ${email}."
-  content="python:view.format_message(m)">stuff</tal:block>
+  content="python:view.fill(m)">stuff</tal:block>
 
 <tal:block
   define="m string:If you are a member of ${view/groupInfo/name}, add your email address to the site ${view/siteInfo/name} by carrying out the following steps."
-  content="python:view.format_message(m)">stuff</tal:block>
+  content="python:view.fill(m)">stuff</tal:block>
   1.  Visit your profile at <tal:block content="string:${view/siteInfo/url}/p"/>
   2.  Click "Change email settings".
   3.  Add your email address: <tal:block content="email"/>
@@ -15,17 +15,17 @@ Hi there,
 <tal:block condition="view/groupVisibility/isPublic"
   define="m string:If you are new to ${view/groupInfo/name} then sign up and join the group at;
     u string:${view/siteInfo/url}/request_registration.html?form.groupId=${view/groupInfo/id}"
-  content="python:'%s\n%s' %(view.format_message(m), u)">stuff</tal:block><tal:block condition="view/groupVisibility/isPrivate"
+  content="python:'%s\n%s' %(view.fill(m), u)">stuff</tal:block><tal:block condition="view/groupVisibility/isPrivate"
   define="m string:If you are new to ${view/groupInfo/name} then you can request membership of the group at;
   u string:${view/groupInfo/url}/request.html;"
-  content="python:'%s\n%s'%(view.format_message(m), u)">stuff</tal:block><tal:block condition="view/groupVisibility/isSecret"
+  content="python:'%s\n%s'%(view.fill(m), u)">stuff</tal:block><tal:block condition="view/groupVisibility/isSecret"
   define="m string:If you are new to ${view/groupInfo/name} then you must be invited to become a member by the group administrator. Contact the group administrator and ask to become a member."
-  content="python:view.format_message(m)">stuff</tal:block>
+  content="python:view.fill(m)">stuff</tal:block>
 
 <tal:block define="m string:Once you are a member, and the site ${view/siteInfo/name} knows about your email address, then you can post to ${view/groupInfo/name}. A copy of your email message is attached at the bottom of this message."
-  content="python:view.format_message(m)">stuff</tal:block>
+  content="python:view.fill(m)">stuff</tal:block>
 
-If you have any problems, email us at  
+If you have any problems, email us at
 <tal:block content="view/siteInfo/get_support_email">this address</tal:block>
 
 Kind regards
