@@ -6,7 +6,7 @@
     <title metal:fill-slot="title">Unknown email:
     <tal:block content="view/groupInfo/name">This group</tal:block>:
     <tal:block content="view/siteInfo/name">This site</tal:block>:
-    </title>    
+    </title>
   </head>
   <body>
     <div metal:fill-slot="body" id="gs-group-member-canpost-unknown-email"
@@ -25,7 +25,7 @@
       <div id="gs-group-member-canpost-unknown-email-all">
         <p>
           If you are a
-          <strong>member</strong> of 
+          <strong>member</strong> of
           <span tal:content="view/groupInfo/name">This Group</span>,
           <strong>add your email address</strong> to the site
           <span tal:content="view/siteInfo/name">This Site</span>
@@ -40,43 +40,43 @@
             <code tal:content="email">this@email.address</code></li>
         </ol>
       </div><!--gs-group-member-canpost-unknown-email-all-->
-      <p id="gs-group-member-canpost-unknown-email-public" 
+      <p id="gs-group-member-canpost-unknown-email-public"
         tal:condition="view/groupVisibility/isPublic">
-        If you are <strong>new</strong> to 
+        If you are <strong>new</strong> to
         <span
           tal:content="view/groupInfo/name">This Group</span> then
         <a tal:attributes="href string:${view/siteInfo/url}/request_registration.html?form.groupId=${view/groupInfo/id}"
            href="#">sign up</a> and join the group.
       </p><!--gs-group-member-canpost-unknown-email-public-->
-      <p id="gs-group-member-canpost-unknown-email-private" 
+      <p id="gs-group-member-canpost-unknown-email-private"
          tal:condition="view/groupVisibility/isPrivate">
-        If you are <strong>new</strong> to 
+        If you are <strong>new</strong> to
         <span tal:content="view/groupInfo/name">This Group</span> then
         you can
         <a tal:attributes="href string:${view/groupInfo/url}/request.html"
            href="#"><strong>request</strong> membership</a> of the group.
       </p><!--gs-group-member-canpost-unknown-email-private-->
-      <p id="gs-group-member-canpost-unknown-email-secret" 
+      <p id="gs-group-member-canpost-unknown-email-secret"
          tal:condition="view/groupVisibility/isSecret">
-        If you are <strong>new</strong> to 
+        If you are <strong>new</strong> to
         <span tal:content="view/groupInfo/name">This Group</span> then
         you must be invited to become a member by the group administrator.
         Contact the group administrator and ask to become a member.
       </p><!--gs-group-member-canpost-unknown-email-secret-->
       <p>
-        Once you are a member, and the site 
+        Once you are a member, and the site
         <span tal:content="view/siteInfo/name">This Site</span>
-        knows about your email address, then you can post to 
+        knows about your email address, then you can post to
         <span tal:content="view/groupInfo/name">This Group</span>.
-        A copy of your email message is attached at the bottom of this 
+        A copy of your email message is attached at the bottom of this
         message.
       </p>
       <!--Troubleshooting/return/warranty/damage information-->
       <p>
-        If you have any problems, email us at 
+        If you have any problems, email us at
         <a tal:define="sa view/siteInfo/get_support_email;
                        m string:Hi,
-                       
+
 I received an 'Unknown Email Address' message when I tried to post from
 ${email} to '${view/groupInfo/name}' ${view/groupInfo/url}
 
