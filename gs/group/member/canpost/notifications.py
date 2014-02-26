@@ -73,8 +73,6 @@ class CannotPostMessageText(CannotPostMessage, TextMixin):
 class UnknownEmailMessage(GroupEmail):
 
     def quote(self, msg):
-        if not msg:
-            raise ValueError('Nothing to quote.')
         retval = quote(to_ascii(msg))
         assert retval
         return retval
