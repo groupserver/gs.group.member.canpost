@@ -32,7 +32,7 @@ class CannotPostMessage(GroupEmail):
         gn = to_ascii(self.groupInfo.name)
         s = 'Subject=%s' % quote('Cannot Post to %s' % gn)
         b = 'body=%s' % quote(self.message_body(userInfo))
-        e = get_support_email(self.context, self.siteInfo.id)
+        e = get_support_email(self.context, self.siteInfo.id)  # FIXME: siteInfo
         retval = 'mailto:%s?%s&%s' % (e, b, s)
         return retval
 
@@ -73,8 +73,9 @@ class CannotPostMessageText(CannotPostMessage, TextMixin):
 class UnknownEmailMessage(GroupEmail):
 
     def quote(self, msg):
-        assert msg
-        retval = quote(msg)
+        if not msg:
+            raise ValueError('Nothing to quote.')
+        retval = quote(to_ascii(msg))
         assert retval
         return retval
 
