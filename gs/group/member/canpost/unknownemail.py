@@ -71,6 +71,8 @@ class Notifier(object):
         msg = self.create_message(s, text, html, origMesg, fromAddress,
                                     toAddress)
         # TODO: Audit
+        # --=mpj17=-- Forward error-correction, to ensure we have everything
+        # needed to send the message.
         if fromAddress and email and msg:
             lm = 'Sending "{0}" to <{1}> from <{2}>'
             logMsg = to_ascii(lm.format(s, email, fromAddress))
