@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##############################################################################
 #
-# Copyright © 2013 OnlineGroups.net and Contributors.
+# Copyright © 2013, 2014 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -12,14 +12,18 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+from __future__ import unicode_literals
 from email import message_from_string
 from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEMessage import MIMEMessage
 from email.utils import parseaddr
+from logging import getLogger
+log = getLogger('gs.group.member.canpost.unknownemail')
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject, getMultiAdapter
+from gs.core import to_ascii
 from gs.email import send_email
 UTF8 = 'utf-8'
 
@@ -59,18 +63,28 @@ class Notifier(object):
         return retval
 
     def notify(self, toAddress, origMesg):
-        s = u'%s: Problem Posting (Action Required)' % self.groupInfo.name
+        s = '{0}: Problem Posting (Action Required)'.format(self.groupInfo.name)
         email = parseaddr(toAddress)[1]
         text = self.textTemplate(email=email)
         html = self.htmlTemplate(email=email)
         fromAddress = self.siteInfo.get_support_email()
-        msg = self.create_message(s.encode(UTF8), text, html, origMesg,
-                             fromAddress, toAddress)
+        msg = self.create_message(s, text, html, origMesg, fromAddress,
+                                    toAddress)
         # TODO: Audit
-        send_email(fromAddress, toAddress, msg)
+        if fromAddress and email and msg:
+            lm = 'Sending "{0}" to <{1}> from <{2}>'
+            logMsg = to_ascii(lm.format(s, toAddress, fromAddress))
+            log.info(logMsg)
+            send_email(fromAddress, email, msg)
+        else:
+            lm = 'Failed to send "{0}" message of length {1} to <{2}> from '\
+                '<{3}>'
+            logMsg = to_ascii(lm.format(s, len(msg), toAddress, fromAddress))
+            log.info(logMsg)
 
-    def create_message(self, subject, txtMessage, htmlMessage, origMesg,
-        fromAddress, toAddresses):
+    @staticmethod
+    def create_message(subject, txtMessage, htmlMessage, origMesg, fromAddress,
+                        toAddresses):
         container = MIMEMultipart('mixed')
         container['Subject'] = str(Header(subject, UTF8))
         container['From'] = fromAddress
@@ -79,16 +93,15 @@ class Notifier(object):
         messageTextContainer = MIMEMultipart('alternative')
         container.attach(messageTextContainer)
 
-        txt = MIMEText(txtMessage.encode(UTF8), 'plain', UTF8)
+        txt = MIMEText(txtMessage, 'plain', UTF8)
         messageTextContainer.attach(txt)
 
-        html = MIMEText(htmlMessage.encode(UTF8), 'html', UTF8)
+        html = MIMEText(htmlMessage, 'html', UTF8)
         messageTextContainer.attach(html)
 
         msg = message_from_string(origMesg)
         m = MIMEMessage(msg)
-        m['Content-Description'] = 'Returned Message: %s' % \
-            msg['Subject']
+        m['Content-Description'] = 'Returned Message: %s' % msg['Subject']
         m['Content-Disposition'] = 'inline'
         m.set_param('name', 'Returned message')
         del m['MIME-Version']
