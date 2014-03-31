@@ -73,7 +73,7 @@ class Notifier(object):
         # TODO: Audit
         if fromAddress and email and msg:
             lm = 'Sending "{0}" to <{1}> from <{2}>'
-            logMsg = to_ascii(lm.format(s, toAddress, fromAddress))
+            logMsg = to_ascii(lm.format(s, email, fromAddress))
             log.info(logMsg)
             send_email(fromAddress, email, msg)
         else:
