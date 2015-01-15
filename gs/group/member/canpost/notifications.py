@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+############################################################################
 #
-# Copyright © 2013 OnlineGroups.net and Contributors.
+# Copyright © 2013, 2015 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -11,14 +11,14 @@
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-##############################################################################
+############################################################################
 from __future__ import absolute_import, unicode_literals
 import re
 from urllib import quote
 from textwrap import TextWrapper
 from zope.component import getMultiAdapter
 from zope.cachedescriptors.property import Lazy
-from Products.XWFMailingListManager.html2txt import convert_to_txt
+from gs.group.list.base.html2txt import convert_to_txt
 from Products.XWFCore.XWFUtils import get_support_email
 from gs.core import to_ascii
 from gs.content.email.base import GroupEmail, TextMixin
@@ -32,7 +32,8 @@ class CannotPostMessage(GroupEmail):
         gn = to_ascii(self.groupInfo.name)
         s = 'Subject=%s' % quote('Cannot Post to %s' % gn)
         b = 'body=%s' % quote(self.message_body(userInfo))
-        e = get_support_email(self.context, self.siteInfo.id)  # FIXME: siteInfo
+        # FIXME: use a siteInfo to get the support email address
+        e = get_support_email(self.context, self.siteInfo.id)
         retval = 'mailto:%s?%s&%s' % (e, b, s)
         return retval
 
@@ -49,8 +50,7 @@ class CannotPostMessage(GroupEmail):
 
     def can_post_for_user(self, userInfo):
         group = self.groupInfo.groupObj
-        retval = getMultiAdapter((group, userInfo),
-                    IGSPostingUser)
+        retval = getMultiAdapter((group, userInfo), IGSPostingUser)
         return retval
 
 
