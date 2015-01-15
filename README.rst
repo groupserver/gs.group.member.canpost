@@ -7,7 +7,7 @@ Determining if a group member can post
 
 :Author: `Michael JasonSmith`_
 :Contact: Michael JasonSmith <mpj17@onlinegroups.net>
-:Date: 2013-05-28
+:Date: 2015-01-14
 :Organization: `GroupServer.org`_
 :Copyright: This document is licensed under a
   `Creative Commons Attribution-Share Alike 3.0 New Zealand License`_
@@ -280,21 +280,21 @@ closer to the mailing list.
 Resources
 =========
 
-- Code repository: https://source.iopen.net/groupserver/gs.group.member.canpost
+- Code repository: https://github.com/groupserver/gs.group.member.canpost
 - Questions and comments to http://groupserver.org/groups/development
 - Report bugs at https://redmine.iopen.net/projects/groupserver
 
 ..  [#list] See
-            <https://source.iopen.net/groupserver/Products.XWFMailingListManager>
+            <https://github.com/groupserver/Products.XWFMailingListManager>
 
 ..  [#topic] See
-             <https://source.iopen.net/groupserver/gs.group.messages.topic>
+             <https://github.com/groupserver/gs.group.messages.topic>
 
 ..  [#start] See
-             <https://source.iopen.net/groupserver/gs.group.messages.starttopic/>
+             <https://github.com/groupserver/gs.group.messages.starttopic/>
 
 ..  [#discussion] See
-                  <https://source.iopen.net/groupserver/gs.group.type.discussion>
+                  <https://github.com/groupserver/gs.group.type.discussion>
 
 ..  [#userType] The user is almost always a 
     ``Products.CustomUserFolder.interfaces.IGSUserInfo`` instance.
