@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+############################################################################
 #
 # Copyright © 2013, 2014 OnlineGroups.net and Contributors.
 # All Rights Reserved.
@@ -11,7 +11,7 @@
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-##############################################################################
+############################################################################
 from __future__ import unicode_literals
 from email import message_from_string
 from email.Header import Header
@@ -39,37 +39,40 @@ class Notifier(object):
     @Lazy
     def siteInfo(self):
         retval = createObject('groupserver.SiteInfo', self.context)
-        assert retval, 'Could not create the SiteInfo from %s' % self.context
+        assert retval, 'Could not create the SiteInfo from %s' % \
+            self.context
         return retval
 
     @Lazy
     def groupInfo(self):
         retval = createObject('groupserver.GroupInfo', self.context)
-        assert retval, 'Could not create the GroupInfo from %s' % self.context
+        assert retval, 'Could not create the GroupInfo from %s' % \
+            self.context
         return retval
 
     @Lazy
     def textTemplate(self):
         retval = getMultiAdapter((self.context, self.request),
-                    name=self.textTemplateName)
+                                 name=self.textTemplateName)
         assert retval
         return retval
 
     @Lazy
     def htmlTemplate(self):
         retval = getMultiAdapter((self.context, self.request),
-                    name=self.htmlTemplateName)
+                                 name=self.htmlTemplateName)
         assert retval
         return retval
 
     def notify(self, toAddress, origMesg):
-        s = '{0}: Problem Posting (Action Required)'.format(self.groupInfo.name)
+        s = '{0}: Problem Posting (Action Required)'.format(
+            self.groupInfo.name)
         email = parseaddr(toAddress)[1]
         text = self.textTemplate(email=email)
         html = self.htmlTemplate(email=email)
         fromAddress = self.siteInfo.get_support_email()
         msg = self.create_message(s, text, html, origMesg, fromAddress,
-                                    toAddress)
+                                  toAddress)
         # TODO: Audit
         # --=mpj17=-- Forward error-correction, to ensure we have everything
         # needed to send the message.
@@ -79,14 +82,15 @@ class Notifier(object):
             log.info(logMsg)
             send_email(fromAddress, email, msg)
         else:
-            lm = 'Failed to send "{0}" message of length {1} to <{2}> from '\
-                '<{3}>'
-            logMsg = to_ascii(lm.format(s, len(msg), toAddress, fromAddress))
+            lm = 'Failed to send "{0}" message of length {1} to <{2}> '\
+                 'from <{3}>'
+            logMsg = to_ascii(lm.format(s, len(msg), toAddress,
+                                        fromAddress))
             log.info(logMsg)
 
     @staticmethod
-    def create_message(subject, txtMessage, htmlMessage, origMesg, fromAddress,
-                        toAddresses):
+    def create_message(subject, txtMessage, htmlMessage, origMesg,
+                       fromAddress, toAddresses):
         container = MIMEMultipart('mixed')
         container['Subject'] = str(Header(subject, UTF8))
         container['From'] = fromAddress
