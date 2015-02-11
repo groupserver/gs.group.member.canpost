@@ -1,6 +1,12 @@
 Changelog
 =========
 
+3.1.1 (2015-02-11)
+------------------
+
+* Handle poorly formatted ``Subject`` lines better
+* Added some basic unit tests
+
 3.1.0 (2015-01-14)
 ------------------
 

@@ -89,12 +89,26 @@ class Notifier(object):
             log.info(logMsg)
 
     @staticmethod
-    def create_message(subject, txtMessage, htmlMessage, origMesg,
+    def create_return_message(msg):
+        retval = MIMEMessage(msg)
+        s = msg.get('Subject', 'No subject').decode('ascii', 'ignore')
+        retval['Content-Description'] = 'Returned message: {0}'.format(s)
+        retval['Content-Disposition'] = 'inline'
+        retval.set_param('name', 'Returned message')
+        del retval['MIME-Version']
+        return retval
+
+    @staticmethod
+    def create_container(subject, fromAddress, toAddresses):
+        retval = MIMEMultipart('mixed')
+        retval['Subject'] = str(Header(subject, UTF8))
+        retval['From'] = fromAddress
+        retval['To'] = toAddresses
+        return retval
+
+    def create_message(self, subject, txtMessage, htmlMessage, origMesg,
                        fromAddress, toAddresses):
-        container = MIMEMultipart('mixed')
-        container['Subject'] = str(Header(subject, UTF8))
-        container['From'] = fromAddress
-        container['To'] = toAddresses
+        container = self.create_container(subject, fromAddress, toAddresses)
 
         messageTextContainer = MIMEMultipart('alternative')
         container.attach(messageTextContainer)
@@ -106,11 +120,7 @@ class Notifier(object):
         messageTextContainer.attach(html)
 
         msg = message_from_string(origMesg)
-        m = MIMEMessage(msg)
-        m['Content-Description'] = 'Returned Message: %s' % msg['Subject']
-        m['Content-Disposition'] = 'inline'
-        m.set_param('name', 'Returned message')
-        del m['MIME-Version']
+        m = self.create_return_message(msg)
         container.attach(m)
 
         retval = container.as_string()
