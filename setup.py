@@ -80,5 +80,7 @@ setup(name='gs.group.member.canpost',
           'Products.XWFCore',
           'Products.GSProfile',
       ],
+      test_suite="gs.group.member.canpost.tests.test_all",
+      tests_require=['mock', ],
       entry_points="""# -*- Entry points: -*-
         """,)
