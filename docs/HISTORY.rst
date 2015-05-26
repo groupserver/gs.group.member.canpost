@@ -1,6 +1,11 @@
 Changelog
 =========
 
+3.1.2 (2015-05-26)
+------------------
+
+* Pointing the *Request* link at the group page
+
 3.1.1 (2015-02-11)
 ------------------
 
@@ -80,3 +85,5 @@ Changelog
 
 * Initial release, inspired (loosely) on code provided by
   ``Products.XWFMailingListManager``.
+
+..  LocalWords:  Changelog
