@@ -16,8 +16,8 @@ Hi there,
   define="m string:If you are new to ${view/groupInfo/name} then sign up and join the group at;
     u string:${view/siteInfo/url}/request_registration.html?form.groupId=${view/groupInfo/id}"
   content="python:'%s\n%s' %(view.fill(m), u)">stuff</tal:block><tal:block condition="view/groupVisibility/isPrivate"
-  define="m string:If you are new to ${view/groupInfo/name} then you can request membership of the group at;
-  u string:${view/groupInfo/url}/request.html;"
+  define="m string:If you are new to ${view/groupInfo/name} then you can *request* membership of the group at;
+  u string:${view/groupInfo/url};"
   content="python:'%s\n%s'%(view.fill(m), u)">stuff</tal:block><tal:block condition="view/groupVisibility/isSecret"
   define="m string:If you are new to ${view/groupInfo/name} then you must be invited to become a member by the group administrator. Contact the group administrator and ask to become a member."
   content="python:view.fill(m)">stuff</tal:block>

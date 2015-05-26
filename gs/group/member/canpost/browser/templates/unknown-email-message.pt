@@ -53,7 +53,7 @@
         If you are <strong>new</strong> to
         <span tal:content="view/groupInfo/name">This Group</span> then
         you can
-        <a tal:attributes="href string:${view/groupInfo/url}/request.html"
+        <a tal:attributes="href view/groupInfo/url"
            href="#"><strong>request</strong> membership</a> of the group.
       </p><!--gs-group-member-canpost-unknown-email-private-->
       <p id="gs-group-member-canpost-unknown-email-secret"
