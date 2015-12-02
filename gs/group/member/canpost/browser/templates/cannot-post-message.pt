@@ -6,15 +6,15 @@
     <title metal:fill-slot="title">Cannot Post:
       <tal:block content="view/groupInfo/name">Group</tal:block>:
       <tal:block content="view/siteInfo/name">Group</tal:block>:
-    </title>    
+    </title>
   </head>
   <body>
-    <div metal:fill-slot="body" id="gs-group-member-canpost-cannot" 
+    <div metal:fill-slot="body" id="gs-group-member-canpost-cannot"
          tal:define="userInfo options/userInfo | view/loggedInUserInfo;">
       <h2>Problem posting to
       <span tal:content="view/groupInfo/name">This Group</span></h2>
       <p>
-        Dear
+        Hello
         <span tal:content="userInfo/name">Member</span>,
       </p>
       <p>
@@ -29,7 +29,7 @@
       </p>
       <!--Troubleshooting/return/warranty/damage information-->
       <p>
-        If you have any problems, email us at 
+        If you have any problems, email us at
         <a tal:attributes="href python:view.supportAddress(userInfo)"
            href="#"><code tal:content="view/siteInfo/get_support_email">this address</code></a>
       </p>
@@ -41,4 +41,3 @@
     </div>
   </body>
 </html>
-

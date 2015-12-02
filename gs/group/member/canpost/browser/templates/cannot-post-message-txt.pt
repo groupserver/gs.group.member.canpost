@@ -1,4 +1,4 @@
-<tal:block define="userInfo options/userInfo | view/loggedInUserInfo;">Dear <tal:block content="userInfo/name">Member</tal:block>,
+<tal:block define="userInfo options/userInfo | view/loggedInUserInfo;">Hello <tal:block content="userInfo/name">Member</tal:block>,
 
 <tal:block
   define="m string:Your email message was not posted to ${view/groupInfo/name}. Below is some information on the problem. Your original message is attached to this email."
