@@ -17,6 +17,7 @@ import os
 from setuptools import setup, find_packages
 from version import get_version
 
+name = 'gs.group.member.canpost'
 version = get_version()
 
 with codecs.open('README.rst', encoding='utf-8') as f:
@@ -25,7 +26,7 @@ with codecs.open(os.path.join("docs", "HISTORY.rst"),
                  encoding='utf-8') as f:
     long_description += '\n' + f.read()
 
-setup(name='gs.group.member.canpost',
+setup(name=name,
       version=version,
       description="Determine if a group member can post.",
       long_description=long_description,
@@ -43,10 +44,11 @@ setup(name='gs.group.member.canpost',
       keywords='groupserver member post group private secret',
       author='Michael JasonSmith',
       author_email='mpj17@onlinegroups.net',
-      url='https://github.com/groupserver/gs.group.member.canpost',
+      url='https://github.com/groupserver/{0}'.format(name),
       license='ZPL 2.1',
       packages=find_packages(exclude=['ez_setup']),
-      namespace_packages=['gs', 'gs.group', 'gs.group.member'],
+      namespace_packages=['.'.join(name.split('.')[:i])
+                          for i in range(1, len(name.split('.')))],
       include_package_data=True,
       zip_safe=False,
       install_requires=[
