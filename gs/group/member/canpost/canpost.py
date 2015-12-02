@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-# Copyright © 2013 OnlineGroups.net and Contributors.
+# Copyright © 2013, 2015 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -12,7 +12,6 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ############################################################################
-from operator import and_
 from zope.cachedescriptors.property import Lazy
 from zope.component import getGlobalSiteManager
 from gs.group.member.canpost.interfaces import IGSCanPostRule
@@ -38,7 +37,7 @@ class CanPostToGroup(object):
 
     @Lazy
     def canPost(self):
-        return reduce(and_, [rule.canPost for rule in self.rules], True)
+        return all([rule.canPost for rule in self.rules])
 
     @Lazy
     def statusNum(self):
