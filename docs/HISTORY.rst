@@ -1,6 +1,14 @@
 Changelog
 =========
 
+3.1.3 (2015-12-02)
+------------------
+
+* Using *Hello* rather than *Dear* in the opening salutation of
+  the *Cannot post* message
+* Switching from using ``functools.reduce`` to ``all`` to
+  determine if someone can post
+
 3.1.2 (2015-05-26)
 ------------------
 
