@@ -43,23 +43,23 @@ class Notifier(object):
     @Lazy
     def textTemplate(self):
         retval = getMultiAdapter((self.context, self.request),
-                    name=self.textTemplateName)
+                                 name=self.textTemplateName)
         assert retval
         return retval
 
     @Lazy
     def htmlTemplate(self):
         retval = getMultiAdapter((self.context, self.request),
-                    name=self.htmlTemplateName)
+                                 name=self.htmlTemplateName)
         assert retval
         return retval
 
     def notify(self, userInfo, siteInfo, groupInfo, origMesg):
         subject = (u'%s: Problem Posting' % groupInfo.name).encode(UTF8)
         text = self.textTemplate(userInfo=userInfo, siteInfo=siteInfo,
-                    groupInfo=groupInfo)
+                                 groupInfo=groupInfo)
         html = self.htmlTemplate(userInfo=userInfo, siteInfo=siteInfo,
-                    groupInfo=groupInfo)
+                                 groupInfo=groupInfo)
         ms = CannotPostMessageSender(self.context, userInfo)
         ms.send_message(subject, text, html, origMesg)
 
