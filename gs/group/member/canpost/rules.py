@@ -12,6 +12,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+from __future__ import absolute_import, unicode_literals, print_function
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject
 from Products.GSGroup.interfaces import IGSGroupInfo
@@ -24,9 +25,9 @@ class BaseRule(object):
         self.userInfo = userInfo
         self.group = group
         self.s = {'checked': False,
-                    'canPost': False,
-                    'status': u'not implemented',
-                    'statusNum': -1, }
+                  'canPost': False,
+                  'status': 'not implemented',
+                  'statusNum': -1, }
 
     @Lazy
     def groupInfo(self):
@@ -69,10 +70,9 @@ class BaseRule(object):
         assert retval in (-1, 0, self.weight), \
             'self.statusNum is "%s", not in range: -1, 0, %s' % \
             (retval, self.weight)
-        assert (retval in (-1, self.weight) and (not self.canPost)) \
-                or ((retval == 0) and self.canPost), 'Mismatch between '\
-                'self.statusNum "%s" and self.canPost "%s"' %\
-                (retval, self.canPost)
+        assert ((retval in (-1, self.weight) and (not self.canPost))
+                or ((retval == 0) and self.canPost)), 'Mismatch between '\
+            'self.statusNum "%s" and self.canPost "%s"' % (retval, self.canPost)
         return retval
 
 
