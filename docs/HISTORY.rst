@@ -8,6 +8,9 @@ Changelog
   the *Cannot post* message
 * Switching from using ``functools.reduce`` to ``all`` to
   determine if someone can post
+* Adding unit tests for the ``CanPost`` class, and the
+  ``BlockedFromPosting`` rule
+* Moving the documentation to Sphinx
 
 3.1.2 (2015-05-26)
 ------------------
