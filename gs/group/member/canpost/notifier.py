@@ -56,7 +56,7 @@ class Notifier(object):
         return retval
 
     def notify(self, userInfo, siteInfo, groupInfo, origMesg):
-        subject = (u'%s: Problem Posting' % groupInfo.name).encode(UTF8)
+        subject = ('%s: Problem Posting' % groupInfo.name).encode(UTF8)
         text = self.textTemplate(userInfo=userInfo, siteInfo=siteInfo,
                                  groupInfo=groupInfo)
         html = self.htmlTemplate(userInfo=userInfo, siteInfo=siteInfo,
