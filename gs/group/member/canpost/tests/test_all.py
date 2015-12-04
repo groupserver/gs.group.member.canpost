@@ -15,7 +15,8 @@
 from __future__ import absolute_import, unicode_literals
 from unittest import TestSuite, main as unittest_main
 from gs.group.member.canpost.tests.unknownemail import TestUnknownEmail
-testCases = (TestUnknownEmail, )
+from gs.group.member.canpost.tests.canpost import TestCanPostToGroup
+testCases = (TestUnknownEmail, TestCanPostToGroup, )
 
 
 def load_tests(loader, tests, pattern):
