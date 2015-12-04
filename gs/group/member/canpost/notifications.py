@@ -14,14 +14,17 @@
 ############################################################################
 from __future__ import absolute_import, unicode_literals
 import re
-from urllib import quote
+import sys
+if sys.version_info >= (3, ):
+    from urllib.parse import quote
+else:
+    from urllib import quote
 from textwrap import TextWrapper
 from zope.component import getMultiAdapter
 from zope.cachedescriptors.property import Lazy
-from gs.group.list.base.html2txt import convert_to_txt
-from Products.XWFCore.XWFUtils import get_support_email
 from gs.core import to_ascii
-from gs.content.email.base import GroupEmail, TextMixin
+from gs.content.email.base import (GroupEmail, TextMixin)
+from gs.group.list.base.html2txt import convert_to_txt
 from gs.group.privacy.interfaces import IGSGroupVisibility
 from .interfaces import IGSPostingUser
 
@@ -29,17 +32,15 @@ from .interfaces import IGSPostingUser
 class CannotPostMessage(GroupEmail):
 
     def supportAddress(self, userInfo):
-        gn = to_ascii(self.groupInfo.name)
-        s = 'Subject=%s' % quote('Cannot Post to %s' % gn)
-        b = 'body=%s' % quote(self.message_body(userInfo))
-        # FIXME: use a siteInfo to get the support email address
-        e = get_support_email(self.context, self.siteInfo.id)
-        retval = 'mailto:%s?%s&%s' % (e, b, s)
+        to = self.siteInfo.get_support_email()
+        subject = 'Cannot Post to {0}'.format(self.groupInfo.name)
+        body = self.message_body(userInfo)
+        retval = self.mailto(to, subject, body)
         return retval
 
     def message_body(self, userInfo):
-        gn = to_ascii(self.groupInfo.name)
-        sn = to_ascii(self.siteInfo.name)
+        gn = self.groupInfo.name
+        sn = self.siteInfo.name
         cp = self.can_post_for_user(userInfo)
         m = 'I had a problem sending an email to %s on %s <%s>. '\
             'The issue was "%s (Reason Number %s)"' % \
