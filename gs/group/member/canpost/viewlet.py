@@ -13,20 +13,22 @@
 #
 ##############################################################################
 from __future__ import absolute_import, unicode_literals, print_function
+from abc import ABCMeta, abstractproperty
 from zope.cachedescriptors.property import Lazy
 from gs.group.base import GroupViewlet
 from .rules import BlockedFromPosting
 
 
 class RuleViewlet(GroupViewlet):
+    __metaclass__ = ABCMeta
+
     @Lazy
     def canPost(self):
         return self.manager.canPost
 
-    @Lazy
+    @abstractproperty
     def show(self):
-        m = 'Sub-classes must implement the "show" method.'
-        raise NotImplementedError(m)
+        '``True`` if the viewlet should be shown'
 
     @Lazy
     def userInfo(self):
