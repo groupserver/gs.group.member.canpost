@@ -12,17 +12,18 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+from __future__ import unicode_literals, absolute_import, print_function
 from email import message_from_string
 from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEMessage import MIMEMessage
+from logging import getLogger
+log = getLogger('gs.group.member.canpost.notifier')
 from zope.component import createObject, getMultiAdapter
 from zope.cachedescriptors.property import Lazy
 from gs.profile.notify.sender import MessageSender
 from gs.profile.notify.notifyuser import NotifyUser
-import logging
-log = logging.getLogger('gs.group.member.canpost.notifier')
 UTF8 = 'utf-8'
 
 

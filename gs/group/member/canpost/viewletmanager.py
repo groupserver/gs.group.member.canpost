@@ -12,7 +12,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals, print_function
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject, getMultiAdapter
 from gs.viewlet.manager import WeightOrderedViewletManager
@@ -44,6 +44,5 @@ class CanPostViewletManager(WeightOrderedViewletManager):
     @Lazy
     def canPost(self):
         group = self.groupInfo.groupObj
-        retval = getMultiAdapter((group, self.userInfo),
-                    IGSPostingUser)
+        retval = getMultiAdapter((group, self.userInfo), IGSPostingUser)
         return retval

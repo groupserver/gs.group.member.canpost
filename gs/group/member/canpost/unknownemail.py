@@ -12,7 +12,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ############################################################################
-from __future__ import unicode_literals
+from __future__ import unicode_literals, absolute_import, print_function
 from email import message_from_string
 from email.Header import Header
 from email.MIMEText import MIMEText

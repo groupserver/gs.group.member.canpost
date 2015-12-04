@@ -12,9 +12,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ############################################################################
+from __future__ import unicode_literals, absolute_import, print_function
 from zope.cachedescriptors.property import Lazy
 from zope.component import getGlobalSiteManager
-from gs.group.member.canpost.interfaces import IGSCanPostRule
+from .interfaces import IGSCanPostRule
 
 
 class CanPostToGroup(object):
