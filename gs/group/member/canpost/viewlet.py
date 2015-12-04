@@ -22,13 +22,19 @@ from .rules import BlockedFromPosting
 class RuleViewlet(GroupViewlet):
     __metaclass__ = ABCMeta
 
+    @abstractproperty
+    def weight(self):
+        'The "weight" of the viewlet. Normally taken from the weight of the rule.'
+
     @Lazy
     def canPost(self):
         return self.manager.canPost
 
-    @abstractproperty
+    @Lazy
     def show(self):
         '``True`` if the viewlet should be shown'
+        retval = self.canPost.statusNum == self.weight
+        return retval
 
     @Lazy
     def userInfo(self):
@@ -37,9 +43,3 @@ class RuleViewlet(GroupViewlet):
 
 class BlockedRuleViewlet(RuleViewlet):
     weight = BlockedFromPosting.weight
-
-    @Lazy
-    def show(self):
-        retval = self.canPost.statusNum == self.weight
-        assert type(retval) == bool
-        return retval
