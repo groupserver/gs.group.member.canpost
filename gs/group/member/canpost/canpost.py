@@ -43,7 +43,7 @@ class CanPostToGroup(object):
     def statusNum(self):
         statusNums = [rule.statusNum for rule in self.rules
                       if rule.statusNum != 0]
-        retval = (statusNums and min(statusNums)) or 0
+        retval = min(statusNums) if statusNums else 0
         assert retval >= 0
         return retval
 
