@@ -92,18 +92,22 @@ class TestCanPostToGroup(TestCase):
 
     @patch.object(CanPostToGroup, 'adaptors', new_callable=PropertyMock)
     def test_rules(self, mock_adaptors):
-        r0 = SimpleRule(True)
-        r1 = SimpleRule(True)
-        mock_adaptors.return_value = [('Ethel', r0), ('the', r1)]
+        'Test the ``rules`` attribute returns just the rules'
+        r0 = SimpleRule()
+        r1 = SimpleRule()
+        r2 = SimpleRule()
+        mock_adaptors.return_value = [('Ethel', r0), ('the', r1), ('frog', r2)]
         canPost = CanPostToGroup(self.group, self.userInfo)
         r = canPost.rules
-        self.assertEqual([r0, r1], r)
+        self.assertEqual([r0, r1, r2], r)
 
     @patch('gs.group.member.canpost.canpost.getGlobalSiteManager')
     def test_adaptors_sorted(self, mock_get_gsm):
+        'Ensure the adaptors are sorted by the ``weight`` attribute'
         mock_gsm = mock_get_gsm()
         mock_gsm.getAdapters.return_value = [
-            ('Ethel', SimpleRule(weight=10)), ('the', SimpleRule(weight=8))]
+            ('Ethel', SimpleRule(weight=8)), ('the', SimpleRule(weight=10)),
+            ('frog', SimpleRule(weight=7))]
         canPost = CanPostToGroup(self.group, self.userInfo)
         r = canPost.adaptors
-        self.assertEqual([8, 10], [a.weight for a in [b[1] for b in r]])
+        self.assertEqual([7, 8, 10], [a.weight for a in [b[1] for b in r]])
