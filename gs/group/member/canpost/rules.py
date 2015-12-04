@@ -13,13 +13,14 @@
 #
 ##############################################################################
 from __future__ import absolute_import, unicode_literals, print_function
+from abc import ABCMeta, abstractmethod, abstractproperty
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject
 from Products.GSGroup.interfaces import IGSGroupInfo
 
 
 class BaseRule(object):
-    weight = None
+    __metaclass__ = ABCMeta
 
     def __init__(self, userInfo, group):
         self.userInfo = userInfo
@@ -28,6 +29,14 @@ class BaseRule(object):
                   'canPost': False,
                   'status': 'not implemented',
                   'statusNum': -1, }
+
+    @abstractproperty
+    def weight(self):
+        'The weight for the rule: rules with lighter weights are evaulated first'
+
+    @abstractmethod
+    def check(self):
+        '''Check that the user can post to the group. Sets ``self.s``.'''
 
     @Lazy
     def groupInfo(self):
@@ -45,10 +54,6 @@ class BaseRule(object):
         retval = mailingListManager.get_list(self.groupInfo.id)
         return retval
 
-    def check(self):
-        m = 'Sub-classes must implement the check method.'
-        raise NotImplementedError(m)
-
     @Lazy
     def canPost(self):
         self.check()
@@ -60,7 +65,6 @@ class BaseRule(object):
     def status(self):
         self.check()
         retval = self.s['status']
-        assert type(retval) == unicode
         return retval
 
     @Lazy
@@ -77,7 +81,7 @@ class BaseRule(object):
 
 
 class BlockedFromPosting(BaseRule):
-    u'''A person will be prevented from posting if he or she is
+    '''A person will be prevented from posting if he or she is
     explicitly blocked by an administrator of the group.'''
     weight = 10
 
@@ -87,15 +91,10 @@ class BlockedFromPosting(BaseRule):
             blockedMemberIds = ml.getProperty('blocked_members', [])
             if (self.userInfo.id in blockedMemberIds):
                 self.s['canPost'] = False
-                self.s['status'] = u'blocked from posting'
+                self.s['status'] = 'blocked from posting'
                 self.s['statusNum'] = self.weight
             else:
                 self.s['canPost'] = True
-                self.s['status'] = u'not blocked from posting'
+                self.s['status'] = 'not blocked from posting'
                 self.s['statusNum'] = 0
             self.s['checked'] = True
-
-        assert self.s['checked']
-        assert type(self.s['canPost']) == bool
-        assert type(self.s['status']) == unicode
-        assert type(self.s['statusNum']) == int
