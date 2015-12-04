@@ -12,7 +12,12 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from urllib import urlencode
+from __future__ import unicode_literals, absolute_import, print_function
+import sys
+if sys.version_info >= (3, ):
+    from urllib.parse import urlencode
+else:
+    from urllib import urlencode
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject
 from zope.app.pagetemplate import ViewPageTemplateFile
@@ -20,7 +25,7 @@ from zope.contentprovider.interfaces import UpdateNotCalled
 from Products.GSGroup.joining import GSGroupJoining  # --=mpj17=-- ?
 from Products.GSGroupMember.groupmembership import JoinableGroupsForSite, \
     InvitationGroupsForSite
-from gs.group.base.contentprovider import GroupContentProvider
+from gs.group.base import GroupContentProvider
 
 
 class GSUserCanPostContentProvider(GroupContentProvider):
@@ -30,8 +35,7 @@ class GSUserCanPostContentProvider(GroupContentProvider):
 
     def update(self):
         self.__updated = True
-        self.groupsInfo = createObject('groupserver.GroupsInfo',
-          self.context)
+        self.groupsInfo = createObject('groupserver.GroupsInfo', self.context)
 
     def render(self):
         if not self.__updated:
@@ -47,8 +51,7 @@ class GSUserCanPostContentProvider(GroupContentProvider):
     @Lazy
     def ptnCoach(self):
         ptnCoachId = self.groupInfo.get_property('ptn_coach_id')
-        retval = createObject('groupserver.UserFromId',
-          self.context, ptnCoachId)
+        retval = createObject('groupserver.UserFromId', self.context, ptnCoachId)
         return retval
 
     @Lazy
@@ -60,10 +63,8 @@ class GSUserCanPostContentProvider(GroupContentProvider):
 
     @Lazy
     def canInvite(self):
-        invitationGroups = InvitationGroupsForSite(self.loggedInUser.user,
-                                               self.groupInfo.groupObj)
-        retval = (self.groupInfo.id in invitationGroups) and \
-          not self.canJoin
+        invitationGroups = InvitationGroupsForSite(self.loggedInUser.user, self.groupInfo.groupObj)
+        retval = (self.groupInfo.id in invitationGroups) and not self.canJoin
         assert type(retval) == bool
         return retval
 
@@ -78,7 +79,7 @@ class GSUserCanPostContentProvider(GroupContentProvider):
     @Lazy
     def signupUrl(self):
         d = {'form.came_from': self.request.URL,
-                'form.groupId': self.groupInfo.id, }
+             'form.groupId': self.groupInfo.id, }
         retval = '/request_registration.html?%s' % urlencode(d)
         return retval
 
