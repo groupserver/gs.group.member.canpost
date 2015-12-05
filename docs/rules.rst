@@ -22,25 +22,29 @@ provides most of what is required to create a rule.
 
    .. attribute:: __doc__
 
-      (Abstract property: sub-classes must provide a weight.) The
-      documentation on the rule, which is shown on the page
-      ``rules.html`` in each group.
+      (Abstract property: sub-classes must provide a doc-string.)
+      The documentation on the rule, which is shown on the page
+      ``rules-list.html`` in each group.
 
    .. attribute:: weight
 
-      (Abstract property: sub-classes must provide a weight.) An
-      integer that has two related functions. First, it is used
-      as the sort-key to determine the order that the rules are
-      checked (see `can post adaptor`_ below). Second, the
-      :attr:`statusNum` is set to this value to uniquely
-      identifies the rule. (No two rules should have the same
-      weight as this can lead to ambiguity.)
+      (Abstract property: sub-classes must provide a
+      :attr:`weight` property.) An integer that has two related
+      functions.
+
+      * First, it is used as the sort-key to determine the order
+        that the rules are checked (see the `can post adaptor`_
+        below).
+
+      * Second, the :attr:`statusNum` is set to this value to
+        uniquely identifies the rule. (No two rules should have
+        the same weight as this can lead to ambiguity.)
 
    .. method:: check()
 
-      (Abstract method: sub-classes must supply :meth:`check`.)
-      Perform the actual check to see if a user can post to a
-      group. Based on the result it sets the values in the
+      (Abstract method: sub-classes must supply a :meth:`check`
+      method.) Perform the actual check to see if a user can post
+      to a group. Based on the result it sets the values in the
       dictionary ``self.s``:
 
       ``checked``:
@@ -115,7 +119,7 @@ The **ZCML** sets up each rule as an adaptor [#WhyZCML]_. It
 adapts a ``userInfo`` and the *specific* group type and provides
 an ``IGSCanPostRule``. The adaptor must be a **named adaptor**,
 as multiple rules are used for each group. The names are also
-shown on the ``rules.html`` page in each group.
+shown on the ``rules-list.html`` page in each group.
 
 .. code-block:: xml
 
@@ -129,12 +133,12 @@ shown on the ``rules.html`` page in each group.
 Can post adaptor
 ----------------
 
-The ``CanPost`` adaptor looks very very very much like the
-adaptor for the `rule abstract base-class`_. However, rather than
-providing a single rule it *aggregates* all the rules for a
-group, giving the final answer as to weather the user can
-post. It provides the answer using the same three properties as
-the rules: :attr:`CanPost.canPost`, :attr:`CanPost.status` and
+The ``CanPost`` adaptor looks very much like the adaptor for the
+`rule abstract base-class`_. However, rather than providing a
+single rule it *aggregates* all the rules for a group, giving the
+final answer as to weather the user can post. It provides the
+answer using the same three properties as the rules:
+:attr:`CanPost.canPost`, :attr:`CanPost.status` and
 :attr:`CanPost.statusNum`.
 
 .. class:: CanPost(userInfo, group)
